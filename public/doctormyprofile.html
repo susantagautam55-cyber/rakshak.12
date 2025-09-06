@@ -1,0 +1,144 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .accordion-content {
+            display: none;
+        }
+        .accordion-header.active + .accordion-content {
+            display: block;
+        }
+        #map {
+            width: 100%;
+            height: 300px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gradient min-h-screen flex flex-col items-center justify-center py-10 px-4">
+    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-3xl rounded-t-3xl shadow-xl z-20">
+        <h1 class="text-xl font-bold">Doctor Profile</h1>
+        <div class="space-x-4">
+            <a href="signin.html" class="hover:underline">Sign Up</a>
+            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
+        </div>
+    </nav>
+    <div class="w-full max-w-3xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12">
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-6">Welcome, Doctor</h1>
+        <div id="doctorProfile" class="space-y-4 mb-8"></div>
+        <div class="mt-6 flex items-center justify-between bg-gray-100 p-4 rounded-xl">
+            <span class="text-lg font-semibold">Status: <span id="statusText" class="text-green-600">Active</span></span>
+            <button id="toggleStatus" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Toggle Status
+            </button>
+        </div>
+        <div class="mt-6">
+            <h2 class="text-xl font-bold mb-2">Nearby Map (Accidents & Ambulances)</h2>
+            <div id="map"></div>
+        </div>
+        <div class="mt-6">
+            <h2 class="text-xl font-bold mb-4">Accident Reports</h2>
+            <div class="border rounded-xl overflow-hidden">
+                <button class="accordion-header w-full text-left px-4 py-3 bg-gray-200 hover:bg-gray-300 font-semibold active">
+                    🚑 Patient 1 - Accident at Location X
+                </button>
+                <div class="accordion-content px-4 py-3 bg-gray-50">
+                    <p><strong>Name:</strong> Ram Sharma</p>
+                    <p><strong>Condition:</strong> Serious Injury</p>
+                    <p><strong>Contact:</strong> 9800000001</p>
+                </div>
+                <button class="accordion-header w-full text-left px-4 py-3 bg-gray-200 hover:bg-gray-300 font-semibold">
+                    🚑 Patient 2 - Emergency at Location Y
+                </button>
+                <div class="accordion-content px-4 py-3 bg-gray-50">
+                    <p><strong>Name:</strong> Sita Gurung</p>
+                    <p><strong>Condition:</strong> Minor Injury</p>
+                    <p><strong>Contact:</strong> 9800000002</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userData = JSON.parse(localStorage.getItem("rakshakUser"));
+            const profileDiv = document.getElementById("doctorProfile");
+            const toggleBtn = document.getElementById("toggleStatus");
+            const statusText = document.getElementById("statusText");
+            if (!userData || userData.userType !== "doctor") {
+                profileDiv.innerHTML = "<h2 class='text-center text-red-600 font-semibold'>Access Denied. You are not a doctor or no data found.</h2>";
+                return;
+            }
+            profileDiv.innerHTML = `
+                <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                    <img src="${userData.photo}" alt="Doctor Photo" class="w-32 h-32 rounded-full shadow-md object-cover border-4 border-blue-500">
+                    <div>
+                        <p class="text-lg"><strong>Name:</strong> Dr. ${userData.fullName}</p>
+                        <p class="text-lg"><strong>Age:</strong> ${userData.age}</p>
+                        <p class="text-lg"><strong>Blood Group:</strong> ${userData.bloodGroup}</p>
+                        <p class="text-lg"><strong>Contact:</strong> ${userData.contact}</p>
+                        <p class="text-lg"><strong>Emergency Contact:</strong> ${userData.emergencyContact}</p>
+                        <p class="text-lg"><strong>Insurance Number:</strong> ${userData.insuranceNumber || "N/A"}</p>
+                    </div>
+                </div>
+            `;
+            toggleBtn.addEventListener("click", () => {
+                const isActive = statusText.textContent === "Active";
+                statusText.textContent = isActive ? "Inactive" : "Active";
+                statusText.classList.toggle("text-green-600", !isActive);
+                statusText.classList.toggle("text-red-600", isActive);
+            });
+            const headers = document.querySelectorAll(".accordion-header");
+            headers.forEach(header => {
+                header.addEventListener("click", () => {
+                    header.classList.toggle("active");
+                    const content = header.nextElementSibling;
+                    content.style.display = content.style.display === "block" ? "none" : "block";
+                });
+            });
+        });
+
+        function initMap() {
+            const center = { lat: 27.7172, lng: 85.3240 };
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 13,
+                center: center,
+            });
+
+            const accidents = [
+                { position: { lat: 27.7172, lng: 85.3240 }, name: "Accident at Location X" },
+                { position: { lat: 27.72, lng: 85.33 }, name: "Emergency at Location Y" }
+            ];
+            const ambulances = [
+                { position: { lat: 27.715, lng: 85.32 }, name: "Ambulance 1" },
+                { position: { lat: 27.725, lng: 85.335 }, name: "Ambulance 2" }
+            ];
+            accidents.forEach(accident => {
+                new google.maps.Marker({
+                    position: accident.position,
+                    map,
+                    title: accident.name,
+                    icon: "https://maps.google.com/mapfiles/kml/paddle/red-circle.png" 
+                });
+            });
+            ambulances.forEach(ambulance => {
+                new google.maps.Marker({
+                    position: ambulance.position,
+                    map,
+                    title: ambulance.name,
+                    icon: "https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png" 
+                });
+            });
+        }
+        
+        function logout() {
+            localStorage.removeItem("rakshakUser");
+            window.location.href = "signup.html";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center py-10 px-4">
+
+    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-2xl rounded-t-3xl shadow-xl z-20">
+        <h1 class="text-xl font-bold">My Profile</h1>
+        <div class="space-x-4">
+            <a href="signin.html" class="hover:underline">Sign Up</a>
+            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
+        </div>
+    </nav>
+
+    <div id="profileContainer" class="w-full max-w-2xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12 text-gray-800 space-y-4">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold mb-4">Normal User Profile</h2>
+            <img id="userPhoto" alt="Profile Photo" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-500 shadow-lg">
+        </div>
+        
+        <p class="text-lg"><strong>Name:</strong> <span id="pName"></span></p>
+        <p class="text-lg"><strong>Age:</strong> <span id="pAge"></span></p>
+        <p class="text-lg"><strong>Blood Group:</strong> <span id="pBlood"></span></p>
+        <p class="text-lg"><strong>Contact:</strong> <span id="pContact"></span></p>
+        <p class="text-lg"><strong>Emergency Contact:</strong> <span id="pEmergency"></span></p>
+        <p class="text-lg"><strong>Insurance:</strong> <span id="pInsurance"></span></p>
+
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userData = JSON.parse(localStorage.getItem("rakshakUser"));
+
+            if (!userData) {
+                document.getElementById("profileContainer").innerHTML = "<h2 class='text-center text-red-600 font-semibold'>No user data found. Please sign up.</h2>";
+                return;
+            }
+            if (userData.userType !== "user") {
+                document.getElementById("profileContainer").innerHTML = "<h2 class='text-center text-red-600 font-semibold'>You are a doctor. Please view your profile on the doctor's page.</h2>";
+                return;
+            }
+            document.getElementById("pName").textContent = userData.fullName;
+            document.getElementById("pAge").textContent = userData.age;
+            document.getElementById("pBlood").textContent = userData.bloodGroup;
+            document.getElementById("pContact").textContent = userData.contact;
+            document.getElementById("pEmergency").textContent = userData.emergencyContact;
+            document.getElementById("pInsurance").textContent = userData.insuranceNumber || "Not provided";
+            document.getElementById("userPhoto").src = userData.photo;
+        });
+
+        function logout() {
+            localStorage.removeItem("rakshakUser");
+            window.location.href = "signup.html";
+        }
+    </script>
+
+</body>
+</html>

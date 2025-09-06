@@ -1,0 +1,118 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOS Emergency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 to-pink-100 min-h-screen flex flex-col">
+    <header class="flex justify-between items-center p-4 bg-white shadow-md">
+        <div class="relative">
+            <button id="menuBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="5" cy="12" r="1.5"/>
+                    <circle cx="12" cy="12" r="1.5"/>
+                    <circle cx="19" cy="12" r="1.5"/>
+                </svg>
+            </button>
+            <div id="menuDropdown" class="hidden absolute mt-2 w-56 bg-white rounded-lg shadow-lg z-50 transition-transform duration-200 ease-out transform origin-top-left">
+                <ul class="py-2 text-gray-700">
+                    <li><a href="myprofile.html" class="block px-4 py-2 hover:bg-gray-100">My Profile</a></li> 
+                    <li><a href="map.html" class="block px-4 py-2 hover:bg-gray-100">Map</a></li>
+                    <li><a href="device.html" class="block px-4 py-2 hover:bg-gray-100">Connected Device</a></li>
+                    <li><a href="hospital.html" class="block px-4 py-2 hover:bg-gray-100">Associated Hospital</a></li>
+                    <li><a href="sos.html" class="block px-4 py-2 hover:bg-gray-100 font-bold text-red-600">SOS Page</a></li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <a href="myprofile.html" class="flex items-center space-x-2">
+                <img id="navPhoto" src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full border border-gray-300 object-cover">
+                <span id="navName" class="font-semibold text-gray-800 hidden md:inline"></span>
+            </a>
+        </div>
+    </header>
+    <main class="flex flex-col flex-grow items-center justify-center text-center px-4">
+        <div id="sosContent">
+            <h1 class="text-4xl font-extrabold text-red-600 mb-6">🚨 SOS Emergency</h1>
+            <p class="text-gray-700 text-lg mb-8">Press the button below to send an emergency alert.</p>
+            <button id="sosBtn" class="bg-red-600 text-white font-bold px-10 py-5 rounded-full text-2xl shadow-lg hover:bg-red-700 transition-transform transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-red-300">
+                Send SOS
+            </button>
+        </div>
+        <div id="noUserContent" class="hidden text-center text-red-600">
+            <h1 class="text-3xl font-bold mb-4">No User Found</h1>
+            <p class="text-lg">You must be signed in to use the SOS feature. Please <a href="signup.html" class="underline font-semibold">sign up</a> first.</p>
+        </div>
+    </main>
+    <footer class="bg-white text-gray-600 text-center py-4 shadow-inner">
+        &copy; 2025 Rakshak | Stay Safe
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuBtn = document.getElementById("menuBtn");
+            const menuDropdown = document.getElementById("menuDropdown");
+            const sosBtn = document.getElementById("sosBtn");
+            const sosContent = document.getElementById("sosContent");
+            const noUserContent = document.getElementById("noUserContent");
+            
+            const user = JSON.parse(localStorage.getItem("rakshakUser"));
+            if (user) {
+                document.getElementById("navName").textContent = user.fullName;
+                document.getElementById("navPhoto").src = user.photo;
+                sosContent.classList.remove("hidden");
+                noUserContent.classList.add("hidden");
+            } else {
+                sosContent.classList.add("hidden");
+                noUserContent.classList.remove("hidden");
+            }
+            menuBtn.addEventListener("click", () => {
+                menuDropdown.classList.toggle("hidden");
+            });
+            if (user) {
+                sosBtn.addEventListener("click", () => {
+                    sosBtn.textContent = "Sending...";
+                    sosBtn.disabled = true;
+                    sosBtn.classList.add("opacity-50", "cursor-not-allowed");
+                    if ("geolocation" in navigator) {
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                const lat = position.coords.latitude;
+                                const lng = position.coords.longitude;
+                                console.log(`SOS sent for user: ${user.fullName} at location: ${lat}, ${lng}`);
+                                setTimeout(() => {
+                                    sosContent.innerHTML = `
+                                        <h1 class="text-4xl font-extrabold text-green-600 mb-6">✅ Alert Sent!</h1>
+                                        <p class="text-gray-700 text-lg mb-8">Help is on the way. Stay calm.</p>
+                                    `;
+                                }, 1500);
+                            },
+                            (error) => {
+                                console.error("Error getting location:", error);
+                                sosBtn.textContent = "Send SOS";
+                                sosBtn.disabled = false;
+                                sosBtn.classList.remove("opacity-50", "cursor-not-allowed");
+                                sosContent.innerHTML = `
+                                    <h1 class="text-4xl font-extrabold text-red-600 mb-6">❌ Location Error</h1>
+                                    <p class="text-gray-700 text-lg mb-8">Could not get your location. Please check your browser settings and try again.</p>
+                                `;
+                            }
+                        );
+                    } else {
+                        sosBtn.textContent = "Send SOS";
+                        sosBtn.disabled = false;
+                        sosBtn.classList.remove("opacity-50", "cursor-not-allowed");
+                        sosContent.innerHTML = `
+                            <h1 class="text-4xl font-extrabold text-red-600 mb-6">❌ Browser Not Supported</h1>
+                            <p class="text-gray-700 text-lg mb-8">Your browser doesn't support geolocation. Please use a modern browser to send an SOS.</p>
+                        `;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
