@@ -1,0 +1,64 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Accident Demo</title>
+</head>
+<body>
+  <h2>Patient Device</h2>
+  <button onclick="startSensors()">Start Monitoring</button>
+  <p id="status">Waiting...</p>
+
+  <script>
+    const serverUrl = "laptop link to be needed to insert";
+    let crashThreshold = 25;
+    let lastSent = 0;
+
+    function startSensors() {
+      if (window.DeviceMotionEvent) {
+        window.addEventListener("devicemotion", handleMotion);
+        document.getElementById("status").innerText = "Monitoring started...";
+      } else {
+        alert("DeviceMotion not supported!");
+      }
+    }
+
+    function handleMotion(event) {
+      const ax = event.acceleration.x || 0;
+      const ay = event.acceleration.y || 0;
+      const az = event.acceleration.z || 0;
+      const a_res = Math.sqrt(ax*ax + ay*ay + az*az);
+
+      if (a_res > crashThreshold && Date.now() - lastSent > 10000) {
+        lastSent = Date.now();
+        sendSOS(ax, ay, az, a_res);
+      }
+    }
+
+    function sendSOS(ax, ay, az, a_res) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const data = {
+          device_id: "patient-01",
+          gps: {
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+            speed: pos.coords.speed
+          },
+          accel: { ax, ay, az, a_res },
+          event: "CRASH_DETECTED"
+        };
+
+        fetch(serverUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(res => {
+          document.getElementById("status").innerText = "SOS Sent!";
+          console.log(res);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
