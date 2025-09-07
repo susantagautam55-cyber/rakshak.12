@@ -20,11 +20,11 @@
 
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center py-10 px-4">
     <nav class="flex justify-between p-4 bg-blue-600 text-white w-full max-w-2xl rounded-t-3xl shadow-xl z-20">
-        <a href="signin.html" class="hover:underline">Sign In</a>
-        <a href="myprofile.html" class="hover:underline">User Profile</a>
-        <a href="doctormyprofile.html" class="hover:underline">Doctor Profile</a>
+       <a href="signin.html" class="hover:underline transform transition-all duration-300 hover:scale-105">Sign In</a>
+<a href="myprofile.html" class="hover:underline transform transition-all duration-300 hover:scale-105">User Profile</a>
+<a href="doctormyprofile.html" class="hover:underline transform transition-all duration-300 hover:scale-105">Doctor Profile</a>
     </nav>
-    <div class="w-full max-w-2xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12 transform transition-transform duration-300 hover:scale-[1.01] hover:shadow-3xl">
+  <div class="w-full max-w-2xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12 transform transition-transform duration-300 hover:scale-[1.01] hover:shadow-2xl">
 
         <div class="flex flex-col items-center justify-center mb-8 md:mb-12 text-center">
             <img src="https://i.ibb.co/L5pY1W1/Rakshak-Logo.png" alt="Rakshak Logo" class="w-32 h-32 mb-4">
@@ -37,7 +37,7 @@
         <form id="signupForm" class="space-y-6">
             <div>
                 <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input type="text" id="fullName" name="fullName" required class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                <input type="text" id="fullName" name="fullName" requiredclass="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors hover:border-gray-400 hover:shadow-sm">
             </div>
             <div>
                 <label for="userType" class="block text-sm font-medium text-gray-700 mb-1">I am a</label>
@@ -72,22 +72,21 @@
             </div>
             <div>
                 <label for="emergencyContact" class="block text-sm font-medium text-gray-700 mb-1">Emergency Contact Number</label>
-                <input type="tel" id="emergencyContact" name="emergencyContact" pattern="[0-9]{10}" required class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                <input type="tel" id="emergencyContact" name="emergencyContact" pattern="[0-9]{10}" required class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors hover:border-gray-400 hover:shadow-sm">
             </div>
             <div>
                 <label for="insuranceNumber" class="block text-sm font-medium text-gray-700 mb-1">Insurance Number</label>
-                <input type="text" id="insuranceNumber" name="insuranceNumber" class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                <input type="text" id="insuranceNumber" name="insuranceNumber" class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors hover:border-gray-400 hover:shadow-sm">
                 <p class="mt-1 text-xs text-gray-500">Optional</p>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Upload Photo</label>
                 <div class="file-input-wrapper relative w-full">
-                    <button type="button" class="bg-gray-200 text-gray-700 px-4 py-3 rounded-xl border border-gray-300 w-full text-left cursor-pointer transition-colors duration-200 hover:bg-gray-300" id="file-upload-button">Choose File</button>
-                    <input type="file" id="photoUpload" name="photo" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer">
+                    <button type="button" class="bg-gray-200 text-gray-700 px-4 py-3 rounded-xl border border-gray-300 w-full text-left cursor-pointer transition-colors duration-200 hover:bg-gray-300 transform hover:scale-[1.02] transition-all" id="file-upload-button">Choose File</button>
                 </div>
                 <p class="mt-1 text-xs text-gray-500" id="file-name-display">No file chosen</p>
             </div>
-            <button id="signupButton" type="submit" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl text-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform duration-300 transform active:scale-95">
+           <button id="signupButton" type="submit" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl text-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform duration-300 transform active:scale-95 hover:scale-[1.02]">
                 Sign Up
             </button>
         </form>
