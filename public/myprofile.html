@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -44,6 +43,7 @@
                     <li><a href="connecteddevice.html" class="block px-4 py-2 hover:bg-gray-100">Connected Device</a></li>
                     <li><a href="associatedhospital.html" class="block px-4 py-2 hover:bg-gray-100">Associated Hospital</a></li>
                     <li><a href="sos.html" class="block px-4 py-2 hover:bg-gray-100 text-red-600">SOS Page</a></li>
+                    <li><button onclick="window.logout()" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">Logout</button></li>
                 </ul>
             </div>
         </div>
@@ -240,12 +240,11 @@
                     patientName: userData.fullName,
                     accidentDetails,
                     injuryDescription,
-                    policeContact: 100,
+                    policeContact: 100, 
                     timestamp: new Date().toISOString()
                 };
                 patientReports.push(newReport);
                 localStorage.setItem("patientReports", JSON.stringify(patientReports));
-
                 fetch(reportServerUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
