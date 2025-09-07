@@ -1,54 +1,81 @@
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Associated Hospital - Rakshak</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Associated Hospital - Rakshak</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-100 min-h-screen flex justify-center p-6">
+<body class="bg-gray-100 min-h-screen flex flex-col justify-center items-center p-6">
 
-  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-lg p-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">🏥 Associated Hospital</h1>
+    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-5xl rounded-t-2xl shadow-xl z-20">
+        <h1 class="text-xl font-bold">Associated Hospital</h1>
+        <div class="space-x-4">
+            <a href="signin.html" class="hover:underline">Sign Up</a>
+            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
+        </div>
+    </nav>
 
-    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-      <h2 class="text-2xl font-semibold text-blue-700 mb-2">Hospital: National Medical Center</h2>
-      <p class="text-gray-700 mb-2"><strong>📍 Location:</strong> Kathmandu, Nepal</p>
-      <p class="text-gray-700"><strong>🆔 Patient ID (Insurance No):</strong> INS-123456789</p>
+    <div class="w-full max-w-5xl bg-white rounded-b-2xl shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">🏥 Associated Hospital</h1>
+
+        <div id="hospitalInfo" class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-blue-700 mb-2">Hospital: National Medical Center</h2>
+            <p class="text-gray-700 mb-2"><strong>📍 Location:</strong> Kathmandu, Nepal</p>
+            <p class="text-gray-700"><strong>🆔 Patient Name:</strong> <span id="patientName">Loading...</span></p>
+            <p class="text-gray-700"><strong>🆔 Insurance No:</strong> <span id="patientId">Loading...</span></p>
+        </div>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">📑 Patient Health Reports</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition">
+                <h3 class="text-lg font-bold text-gray-700 mb-2">Blood Test Report</h3>
+                <p class="text-gray-600 text-sm mb-2">📅 Date: 2025-09-01</p>
+                <p class="text-gray-700">Hemoglobin: <span class="font-semibold">13.5 g/dL</span></p>
+                <p class="text-gray-700">WBC Count: <span class="font-semibold">7,800 /µL</span></p>
+            </div>
+
+            <div class="bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition">
+                <h3 class="text-lg font-bold text-gray-700 mb-2">ECG Report</h3>
+                <p class="text-gray-600 text-sm mb-2">📅 Date: 2025-09-03</p>
+                <p class="text-gray-700">Heart Rate: <span class="font-semibold">76 bpm</span></p>
+                <p class="text-gray-700">Result: <span class="font-semibold text-green-600">Normal</span></p>
+            </div>
+
+            <div class="bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition">
+                <h3 class="text-lg font-bold text-gray-700 mb-2">X-Ray Report</h3>
+                <p class="text-gray-600 text-sm mb-2">📅 Date: 2025-09-05</p>
+                <p class="text-gray-700">Chest Condition: <span class="font-semibold">Clear</span></p>
+                <p class="text-gray-700">Notes: <span class="font-semibold">No Abnormalities</span></p>
+            </div>
+
+            <div class="bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition">
+                <h3 class="text-lg font-bold text-gray-700 mb-2">MRI Scan Report</h3>
+                <p class="text-gray-600 text-sm mb-2">📅 Date: 2025-09-07</p>
+                <p class="text-gray-700">Brain MRI: <span class="font-semibold">Normal</span></p>
+                <p class="text-gray-700">Doctor Notes: <span class="font-semibold">Healthy</span></p>
+            </div>
+        </div>
     </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userData = JSON.parse(localStorage.getItem("rakshakUser"));
+            const hospitalInfo = document.getElementById("hospitalInfo");
+            
+            if (!userData) {
+                hospitalInfo.innerHTML = "<h2 class='text-center text-red-600 font-semibold'>No user data found. Please sign up.</h2>";
+                return;
+            }
+            document.getElementById("patientName").textContent = userData.fullName;
+            document.getElementById("patientId").textContent = userData.insuranceNumber || "N/A";
+        });
 
-    <h2 class="text-2xl font-semibold text-gray-800 mb-4">📑 Patient Health Reports</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition">
-        <h3 class="text-lg font-bold text-gray-700 mb-2">Blood Test Report</h3>
-        <p class="text-gray-600 text-sm mb-2">📅 Date: 2025-09-01</p>
-        <p class="text-gray-700">Hemoglobin: <span class="font-semibold">13.5 g/dL</span></p>
-        <p class="text-gray-700">WBC Count: <span class="font-semibold">7,800 /µL</span></p>
-      </div>
-
-      <div class="bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition">
-        <h3 class="text-lg font-bold text-gray-700 mb-2">ECG Report</h3>
-        <p class="text-gray-600 text-sm mb-2">📅 Date: 2025-09-03</p>
-        <p class="text-gray-700">Heart Rate: <span class="font-semibold">76 bpm</span></p>
-        <p class="text-gray-700">Result: <span class="font-semibold text-green-600">Normal</span></p>
-      </div>
-
-      <div class="bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition">
-        <h3 class="text-lg font-bold text-gray-700 mb-2">X-Ray Report</h3>
-        <p class="text-gray-600 text-sm mb-2">📅 Date: 2025-09-05</p>
-        <p class="text-gray-700">Chest Condition: <span class="font-semibold">Clear</span></p>
-        <p class="text-gray-700">Notes: <span class="font-semibold">No Abnormalities</span></p>
-      </div>
-
-      <div class="bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition">
-        <h3 class="text-lg font-bold text-gray-700 mb-2">MRI Scan Report</h3>
-        <p class="text-gray-600 text-sm mb-2">📅 Date: 2025-09-07</p>
-        <p class="text-gray-700">Brain MRI: <span class="font-semibold">Normal</span></p>
-        <p class="text-gray-700">Doctor Notes: <span class="font-semibold">Healthy</span></p>
-      </div>
-    </div>
-
-  </div>
-
+        function logout() {
+            localStorage.removeItem("rakshakUser");
+            window.location.href = "signin.html";
+        }
+    </script>
 </body>
 </html>

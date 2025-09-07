@@ -43,6 +43,10 @@
         <div class="mt-6">
             <h2 class="text-xl font-bold mb-4">Accident Reports</h2>
             <div class="border rounded-xl overflow-hidden">
+    <div id="realtimeAlerts" class="space-y-4 p-4">
+        <p class="text-center text-gray-500">Waiting for live SOS alerts...</p>
+    </div>
+    <h2 class="px-4 py-2 font-bold text-gray-700">Past Reports (Placeholder)</h2>
                 <button class="accordion-header w-full text-left px-4 py-3 bg-gray-200 hover:bg-gray-300 font-semibold active">
                     🚑 Patient 1 - Accident at Location X
                 </button>
@@ -139,6 +143,44 @@
             localStorage.removeItem("rakshakUser");
             window.location.href = "signin.html";
         }
+const ws = new WebSocket('ws://localhost:3000');
+
+ws.onopen = () => {
+    console.log('Connected to WebSocket server as a doctor.');
+};
+
+ws.onmessage = (event) => {
+    const alertData = JSON.parse(event.data);
+    console.log("🔔 New SOS alert received:", alertData);
+
+    const alertsContainer = document.getElementById('realtimeAlerts');
+
+    const waitingMessage = alertsContainer.querySelector('p');
+    if (waitingMessage && waitingMessage.textContent.includes('Waiting')) {
+        alertsContainer.innerHTML = '';
+    }
+
+    const alertElement = document.createElement('div');
+    alertElement.classList.add('bg-red-100', 'text-red-800', 'p-4', 'rounded-lg', 'shadow-md', 'border', 'border-red-200');
+    
+    alertElement.innerHTML = `
+        <h3 class="font-bold text-xl mb-1">${alertData.fullName} Needs Help!</h3>
+        <p class="text-sm"><strong>Blood Group:</strong> ${alertData.bloodGroup}</p>
+        <p class="text-sm"><strong>Contact:</strong> <a href="tel:${alertData.contact}" class="underline text-red-600">${alertData.contact}</a></p>
+        <p class="text-sm"><strong>Emergency Contact:</strong> <a href="tel:${alertData.emergencyContact}" class="underline text-red-600">${alertData.emergencyContact}</a></p>
+        <p class="text-sm mt-2"><strong>Location:</strong> <a href="https://www.google.com/maps?q=${alertData.latitude},${alertData.longitude}" target="_blank" class="underline text-red-600">View on Map</a></p>
+    `;
+
+    alertsContainer.prepend(alertElement);
+};
+
+ws.onclose = () => {
+    console.log('Disconnected from WebSocket server.');
+};
+
+ws.onerror = (error) => {
+    console.error('WebSocket error:', error);
+};
     </script>
 </body>
 </html>

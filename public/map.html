@@ -1,0 +1,123 @@
+<html>
+<head>
+    <title>Accident Location Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_EyD4-JrRRWcr2hjhnze7s0g275ww7Jc &callback=initMap"></script>
+
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        #info {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            font-family: Arial, sans-serif;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="flex flex-col">
+
+    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full shadow-xl z-20">
+        <h1 class="text-xl font-bold">Rakshak Map</h1>
+        <div class="space-x-4">
+            <a href="doctormyprofile.html" class="hover:underline">Dashboard</a>
+            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
+        </div>
+    </nav>
+
+    <div id="info">
+        <h3>🚑 Accident Alerts</h3>
+        <p id="status" class="font-bold">Waiting for SOS...</p>
+    </div>
+
+    <div id="map"></div>
+
+    <script>
+        let map;
+        let markers = [];
+        let infoWindow;
+
+        function logout() {
+            localStorage.removeItem("rakshakUser");
+            window.location.href = "signin.html";
+        }
+
+        function initMap() {
+            const defaultLoc = { lat: 28.3949, lng: 84.1240 };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 7,
+                center: defaultLoc,
+            });
+
+            infoWindow = new google.maps.InfoWindow();
+            map.addListener('click', () => {
+                if (infoWindow) {
+                    infoWindow.close();
+                }
+            });
+        }
+
+ const socket = new WebSocket("ws://YOUR_LAPTOP_IP:192.168.1.6");
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log("SOS data received:", data);
+
+            document.getElementById("status").innerHTML = `<b>New Alert!</b> from ${data.fullName || "Device"} at ${new Date().toLocaleTimeString()}`;
+
+            if (data.latitude && data.longitude) {
+                addMarker(data);
+            }
+        };
+
+        function addMarker(data) {
+            const position = { lat: data.latitude, lng: data.longitude };
+
+            const marker = new google.maps.Marker({
+                position,
+                map,
+                title: `🚨 SOS from ${data.fullName || "Device"}`,
+            });
+            markers.push(marker);
+
+            const infoContent = `
+                <div class="p-2">
+                    <b>🚨 Accident Detected</b><br>
+                    <strong>Name:</strong> ${data.fullName || "N/A"}<br>
+                    <strong>Contact:</strong> <a href="tel:${data.contact}" class="text-blue-600">${data.contact || "N/A"}</a><br>
+                    <strong>Emergency:</strong> <a href="tel:${data.emergencyContact}" class="text-blue-600">${data.emergencyContact || "N/A"}</a><br>
+                    <strong>Blood Group:</strong> ${data.bloodGroup || "N/A"}<br>
+                    <strong>Time:</strong> ${new Date().toLocaleTimeString()}
+                </div>
+            `;
+            
+            marker.addListener("click", () => {
+                infoWindow.setContent(infoContent);
+                infoWindow.open(map, marker);
+            });
+
+            map.setCenter(position);
+            map.setZoom(14);
+        }
+    </script>
+</body>
+</html>

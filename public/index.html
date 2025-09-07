@@ -1,21 +1,62 @@
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Rakshak</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="script.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rakshak - Your Safety, Our Priority</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body>
-  <h1>🚑 Welcome to Rakshak</h1>
-  <nav>
-    <a href="myprofile.html">My Profile</a>
-    <a href="doctormyprofile.html">doctor profile</a>
-    <a href="sos.html">SOS</a>
-    <a href="associatedhospital.html">Hospitals</a>
-    <a href="map.html">Map</a>
-    <a href="connecteddevices.html">Devices</a>
-    <a href="sensor.html">sensor</a>
-  </nav>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center py-10 px-4">
+
+    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-2xl rounded-t-3xl shadow-xl z-20">
+        <h1 class="text-xl font-bold">Rakshak</h1>
+        <div class="space-x-4">
+            <a href="myprofile.html" class="hover:underline">My Profile</a>
+            <a href="doctormyprofile.html" class="hover:underline">Doctor Profile</a>
+            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
+        </div>
+    </nav>
+
+    <div class="w-full max-w-2xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12 text-gray-800 text-center">
+        <h1 class="text-5xl md:text-6xl font-extrabold text-gray-800 tracking-tight mb-4">🚑 Welcome to Rakshak</h1>
+        <p class="text-lg text-gray-600 mb-8">
+            Your safety is our priority. Rakshak connects you with medical professionals in real-time emergency situations.
+        </p>
+        
+        <div class="space-y-4">
+            <button id="mainButton" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl text-lg hover:bg-blue-700 transition-transform transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                Get Started
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const mainButton = document.getElementById('mainButton');
+            const user = JSON.parse(localStorage.getItem("rakshakUser"));
+
+            if (user) {
+                mainButton.textContent = "Go to Dashboard";
+                mainButton.addEventListener('click', () => {
+                    const redirectUrl = user.userType === 'doctor' ? 'doctormyprofile.html' : 'myprofile.html';
+                    window.location.href = redirectUrl;
+                });
+            } else {
+                mainButton.addEventListener('click', () => {
+                    window.location.href = 'signin.html';
+                });
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem("rakshakUser");
+            window.location.href = "signin.html";
+        }
+    </script>
 </body>
 </html>
-

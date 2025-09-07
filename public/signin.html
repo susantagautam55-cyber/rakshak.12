@@ -34,7 +34,7 @@
             transform: translate(-50%, -50%);
             padding: 1.5rem;
             border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgba(135, 221, 247, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(83, 101, 244, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             z-index: 1000;
         }
     </style>
@@ -49,7 +49,7 @@
     <div class="w-full max-w-2xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12 transform transition-transform duration-300 hover:scale-[1.01] hover:shadow-3xl">
 
         <div class="flex flex-col items-center justify-center mb-8 md:mb-12 text-center">
-            <img src="c:\Users\somnathsharma\Downloads\logo rakshak.png" alt="Rakshak Logo" class="mb-4">
+            <img src="logo rakshak.png" alt="Rakshak Logo" class="mb-4">
             <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 tracking-tight">Rakshak Sign Up</h1>
         </div>
         <p class="text-center text-gray-600 mb-8 md:mb-10 text-lg">
@@ -123,97 +123,99 @@
             </svg>
         </button>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('signupForm');
-            const fileInput = document.getElementById('photoUpload');
-            const fileNameDisplay = document.getElementById('file-name-display');
-            const fileUploadButton = document.getElementById('file-upload-button');
-            const messageBox = document.getElementById('messageBox');
-            const messageText = document.getElementById('messageText');
-            const closeMessageButton = document.getElementById('closeMessage');
-            fileInput.addEventListener('change', (event) => {
-                const fileName = event.target.files[0] ? event.target.files[0].name : 'No file chosen';
-                fileNameDisplay.textContent = fileName;
-                fileUploadButton.textContent = "Change File";
-            });
-            
-            const showMessage = (message, isSuccess = true) => {
-                messageText.textContent = message;
-                messageBox.classList.toggle('bg-green-100', isSuccess);
-                messageBox.classList.toggle('text-green-800', isSuccess);
-                messageBox.classList.toggle('bg-red-100', !isSuccess);
-                messageBox.classList.toggle('text-red-800', !isSuccess);
-                messageBox.style.display = 'block';
-            };
-            const hideMessage = () => {
-                messageBox.style.display = 'none';
-            };
-            closeMessageButton.addEventListener('click', hideMessage);
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const fullName = document.getElementById('fullName').value.trim();
-                const age = document.getElementById('age').value;
-                const bloodGroup = document.getElementById('bloodGroup').value;
-                const contact = document.getElementById('contact').value.trim();
-                const emergencyContact = document.getElementById('emergencyContact').value.trim();
-                const insuranceNumber = document.getElementById('insuranceNumber').value.trim();
-                const userType = document.getElementById('userType').value;
-                const photo = document.getElementById('photoUpload').files[0];
-                if (!fullName || !age || !bloodGroup || !contact || !emergencyContact || !photo || !userType) {
-                    showMessage("Please fill out all required fields.", false);
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    const userData = {
-                        fullName,
-                        age,
-                        bloodGroup,
-                        contact,
-                        emergencyContact,
-                        insuranceNumber,
-                        userType,
-                        photo: event.target.result 
-                    };
-                    localStorage.setItem("rakshakUser", JSON.stringify(userData));
-                    showMessage("Sign up successful! Redirecting...", true);
-                    setTimeout(() => {
-                        const redirectUrl = userType === 'doctor' ? 'doctormyprofile.html' : 'myprofile.html';
-                        window.location.href = redirectUrl;
-                    }, 1500);
-            fetch('/api/signup', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(userData)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showMessage("Sign up successful! Redirecting...", true);
-                            setTimeout(() => {
-                                const redirectUrl = userType === 'doctor' ? 'doctormyprofile.html' : 'myprofile.html';
-                                window.location.href = redirectUrl;
-                            }, 1500);
-                        } else {
-                            showMessage("Sign up failed. Please try again.", false);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showMessage("An error occurred. Please try again.", false);
-                    });
-                                  };
-                reader.readAsDataURL(photo);
-            });
-        });
+        <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('signupForm');
+        const fileInput = document.getElementById('photoUpload');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const fileUploadButton = document.getElementById('file-upload-button');
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+        const closeMessageButton = document.getElementById('closeMessage');
 
-        function logout() {
-            localStorage.removeItem("rakshakUser");
-            window.location.href = "signin.html";
-        }
-    </script>
+        fileInput.addEventListener('change', (event) => {
+            const fileName = event.target.files[0] ? event.target.files[0].name : 'No file chosen';
+            fileNameDisplay.textContent = fileName;
+            fileUploadButton.textContent = "Change File";
+        });
+        
+        const showMessage = (message, isSuccess = true) => {
+            messageText.textContent = message;
+            messageBox.classList.toggle('bg-green-100', isSuccess);
+            messageBox.classList.toggle('text-green-800', isSuccess);
+            messageBox.classList.toggle('bg-red-100', !isSuccess);
+            messageBox.classList.toggle('text-red-800', !isSuccess);
+            messageBox.style.display = 'block';
+        };
+
+        const hideMessage = () => {
+            messageBox.style.display = 'none';
+        };
+
+        closeMessageButton.addEventListener('click', hideMessage);
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value.trim();
+            const age = document.getElementById('age').value;
+            const bloodGroup = document.getElementById('bloodGroup').value;
+            const contact = document.getElementById('contact').value.trim();
+            const emergencyContact = document.getElementById('emergencyContact').value.trim();
+            const insuranceNumber = document.getElementById('insuranceNumber').value.trim();
+            const userType = document.getElementById('userType').value;
+            const photo = document.getElementById('photoUpload').files[0];
+
+            if (!fullName || !age || !bloodGroup || !contact || !emergencyContact || !photo || !userType) {
+                showMessage("Please fill out all required fields.", false);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const userData = {
+                    fullName,
+                    age,
+                    bloodGroup,
+                    contact,
+                    emergencyContact,
+                    insuranceNumber,
+                    userType,
+                    photo: event.target.result 
+                };
+                localStorage.setItem("rakshakUser", JSON.stringify(userData));
+
+                fetch('/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage("Sign up successful! Redirecting...", true);
+                        setTimeout(() => {
+                            const redirectUrl = userType === 'doctor' ? 'doctormyprofile.html' : 'myprofile.html';
+                            window.location.href = redirectUrl;
+                        }, 1500);
+                    } else {
+                        showMessage("Sign up failed. Please try again.", false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage("An error occurred. Please try again.", false);
+                });
+            };
+            reader.readAsDataURL(photo);
+        });
+    });
+
+    function logout() {
+        localStorage.removeItem("rakshakUser");
+        window.location.href = "signin.html";
+    }
+</script>
 </body>
 </html>

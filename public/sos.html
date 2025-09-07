@@ -60,6 +60,7 @@
             const noUserContent = document.getElementById("noUserContent");
             
             const user = JSON.parse(localStorage.getItem("rakshakUser"));
+
             if (user) {
                 document.getElementById("navName").textContent = user.fullName;
                 document.getElementById("navPhoto").src = user.photo;
@@ -69,26 +70,53 @@
                 sosContent.classList.add("hidden");
                 noUserContent.classList.remove("hidden");
             }
+            
             menuBtn.addEventListener("click", () => {
                 menuDropdown.classList.toggle("hidden");
             });
+
             if (user) {
                 sosBtn.addEventListener("click", () => {
                     sosBtn.textContent = "Sending...";
                     sosBtn.disabled = true;
                     sosBtn.classList.add("opacity-50", "cursor-not-allowed");
+                    
                     if ("geolocation" in navigator) {
                         navigator.geolocation.getCurrentPosition(
                             (position) => {
                                 const lat = position.coords.latitude;
                                 const lng = position.coords.longitude;
                                 console.log(`SOS sent for user: ${user.fullName} at location: ${lat}, ${lng}`);
-                                setTimeout(() => {
-                                    sosContent.innerHTML = `
-                                        <h1 class="text-4xl font-extrabold text-green-600 mb-6">✅ Alert Sent!</h1>
-                                        <p class="text-gray-700 text-lg mb-8">Help is on the way. Stay calm.</p>
-                                    `;
-                                }, 1500);
+
+                                const sosData = {
+                                    fullName: user.fullName,
+                                    contact: user.contact,
+                                    emergencyContact: user.emergencyContact,
+                                    bloodGroup: user.bloodGroup,
+                                    latitude: lat,
+                                    longitude: lng
+                                };
+
+                                fetch('/api/sos', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(sosData)
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log("Server response:", data);
+                                    setTimeout(() => {
+                                        sosContent.innerHTML = `
+                                            <h1 class="text-4xl font-extrabold text-green-600 mb-6">✅ Alert Sent!</h1>
+                                            <p class="text-gray-700 text-lg mb-8">Help is on the way. Stay calm.</p>
+                                        `;
+                                    }, 1500);
+                                })
+                                .catch(error => {
+                                    console.error("Error sending SOS:", error);
+                                    sosContent.innerHTML = `<h1 class="text-4xl font-extrabold text-red-600 mb-6">❌ Error</h1><p class="text-gray-700 text-lg mb-8">Could not send alert. Please try again.</p>`;
+                                });
+
                             },
                             (error) => {
                                 console.error("Error getting location:", error);
