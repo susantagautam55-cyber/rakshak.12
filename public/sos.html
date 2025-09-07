@@ -6,13 +6,20 @@
     <title>SOS Emergency</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+    font-family: 'Inter', sans-serif;
+    animation: fadeIn 1s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
     </style>
 </head>
 <body class="bg-gradient-to-br from-red-50 to-pink-100 min-h-screen flex flex-col">
-    <header class="flex justify-between items-center p-4 bg-white shadow-md">
+    <header class="flex justify-between items-center p-4 bg-white shadow-md transform transition-all duration-300 hover:scale-[1.01] hover:shadow-lg">
         <div class="relative">
-            <button id="menuBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+            <button id="menuBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transform transition-all duration-300 hover:scale-105">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <circle cx="5" cy="12" r="1.5"/>
                     <circle cx="12" cy="12" r="1.5"/>
@@ -21,27 +28,26 @@
             </button>
             <div id="menuDropdown" class="hidden absolute mt-2 w-56 bg-white rounded-lg shadow-lg z-50 transition-transform duration-200 ease-out transform origin-top-left">
                 <ul class="py-2 text-gray-700">
-                    <li><a href="myprofile.html" class="block px-4 py-2 hover:bg-gray-100">My Profile</a></li> 
-                    <li><a href="map.html" class="block px-4 py-2 hover:bg-gray-100">Map</a></li>
-                    <li><a href="connecteddevice.html" class="block px-4 py-2 hover:bg-gray-100">Connected Device</a></li>
-                    <li><a href="associatedhospital.html" class="block px-4 py-2 hover:bg-gray-100">Associated Hospital</a></li>
-                    <li><a href="sos.html" class="block px-4 py-2 hover:bg-gray-100 font-bold text-red-600">SOS Page</a></li>
+                    <li><a href="myprofile.html" class="block px-4 py-2 hover:bg-gray-100 transform transition-all duration-300 hover:scale-105 hover:text-blue-600">My Profile</a></li> 
+<li><a href="map.html" class="block px-4 py-2 hover:bg-gray-100 transform transition-all duration-300 hover:scale-105 hover:text-blue-600">Map</a></li>
+<li><a href="connecteddevice.html" class="block px-4 py-2 hover:bg-gray-100 transform transition-all duration-300 hover:scale-105 hover:text-blue-600">Connected Device</a></li>
+<li><a href="associatedhospital.html" class="block px-4 py-2 hover:bg-gray-100 transform transition-all duration-300 hover:scale-105 hover:text-blue-600">Associated Hospital</a></li>
+<li><a href="sos.html" class="block px-4 py-2 hover:bg-gray-100 font-bold text-red-600 transform transition-all duration-300 hover:scale-105">SOS Page</a></li>
                 </ul>
             </div>
         </div>
         <div>
-            <a href="myprofile.html" class="flex items-center space-x-2">
+            <a href="myprofile.html" class="flex items-center space-x-2 transform transition-all duration-300 hover:scale-105">
                 <img id="navPhoto" src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full border border-gray-300 object-cover">
                 <span id="navName" class="font-semibold text-gray-800 hidden md:inline"></span>
             </a>
         </div>
     </header>
-    <main class="flex flex-col flex-grow items-center justify-center text-center px-4">
+ <main class="flex flex-col flex-grow items-center justify-center text-center px-4 transform transition-all duration-300 hover:scale-[1.01] hover:bg-gray-50">
         <div id="sosContent">
             <h1 class="text-4xl font-extrabold text-red-600 mb-6">🚨 SOS Emergency</h1>
             <p class="text-gray-700 text-lg mb-8">Press the button below to send an emergency alert.</p>
-            <button id="sosBtn" class="bg-red-600 text-white font-bold px-10 py-5 rounded-full text-2xl shadow-lg hover:bg-red-700 transition-transform transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-red-300">
-                Send SOS
+            <button id="sosBtn" class="bg-red-600 text-white font-bold px-10 py-5 rounded-full text-2xl shadow-lg hover:bg-red-700 transition-transform transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-red-300 hover:scale-[1.05] transition-all duration-300">
             </button>
         </div>
         <div id="noUserContent" class="hidden text-center text-red-600">
@@ -49,7 +55,7 @@
             <p class="text-lg">You must be signed in to use the SOS feature. Please <a href="signin.html" class="underline font-semibold">sign up</a> first.</p>
         </div>
     </main>
-    <footer class="bg-white text-gray-600 text-center py-4 shadow-inner">
+    <footer class="bg-white text-gray-600 text-center py-4 shadow-inner transform transition-all duration-300 hover:scale-[1.01] hover:bg-gray-50">
         &copy; 2025 Rakshak | Stay Safe
     </footer>
     <script>
