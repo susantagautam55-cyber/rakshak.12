@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const WebSocket = require('ws');
 const path = require('path');
+const { connect } = require('http2');
 
 const app = express();
 
@@ -11,7 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const server = app.listen(3000, () => {
     console.log("Server running on port 3000!");
-    console.log("Your website is live at http://localhost:3000/signin.html");
+    console.log("Your website is live");
 });
 
 const wss = new WebSocket.Server({ server });
