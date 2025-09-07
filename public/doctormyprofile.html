@@ -2,185 +2,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Profile</title>
+    <title>Doctor Profile - Rakshak</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
     <style>
-        .accordion-content {
+        body { font-family: 'Inter', sans-serif; }
+        .modal {
             display: none;
-        }
-        .accordion-header.active + .accordion-content {
-            display: block;
-        }
-        #map {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
             width: 100%;
-            height: 300px;
-            border-radius: 12px;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        #map { height: 400px; width: 100%; }
+        .sos-alert-card {
+            border-left: 4px solid;
+            border-color: #ef4444; /* red-500 */
         }
     </style>
 </head>
-<body class="bg-gradient min-h-screen flex flex-col items-center justify-center py-10 px-4">
-    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-3xl rounded-t-3xl shadow-xl z-20">
-        <h1 class="text-xl font-bold">Doctor Profile</h1>
-        <div class="space-x-4">
-            <a href="signin.html" class="hover:underline">Sign Up</a>
-            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
-        </div>
-    </nav>
-    <div class="w-full max-w-3xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12">
-        <h1 class="text-3xl font-extrabold text-gray-800 mb-6">Welcome, Doctor</h1>
-        <div id="doctorProfile" class="space-y-4 mb-8"></div>
-        <div class="mt-6 flex items-center justify-between bg-gray-100 p-4 rounded-xl">
-            <span class="text-lg font-semibold">Status: <span id="statusText" class="text-green-600">Active</span></span>
-            <button id="toggleStatus" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Toggle Status
+<body class="bg-gray-100 min-h-screen flex flex-col justify-center items-center p-6">
+    <header class="flex justify-between items-center p-4 bg-white shadow-md w-full max-w-5xl rounded-t-2xl">
+        <div class="relative">
+            <button id="menuBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="5" cy="12" r="1.5"/>
+                    <circle cx="12" cy="12" r="1.5"/>
+                    <circle cx="19" cy="12" r="1.5"/>
+                </svg>
             </button>
+            <div id="menuDropdown" class="hidden absolute mt-2 w-56 bg-white rounded-lg shadow-lg z-50 transition-transform duration-200 ease-out transform origin-top-left">
+                <ul class="py-2 text-gray-700">
+                    <li><a href="myprofile.html" class="block px-4 py-2 hover:bg-gray-100">My Profile</a></li>
+                    <li><a href="map.html" class="block px-4 py-2 hover:bg-gray-100">Map</a></li>
+                    <li><a href="connecteddevice.html" class="block px-4 py-2 hover:bg-gray-100">Connected Device</a></li>
+                    <li><a href="associatedhospital.html" class="block px-4 py-2 hover:bg-gray-100">Associated Hospital</a></li>
+                    <li><a href="sos.html" class="block px-4 py-2 hover:bg-gray-100 text-red-600">SOS Page</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="mt-6">
-            <h2 class="text-xl font-bold mb-2">Nearby Map (Accidents & Ambulances)</h2>
-            <div id="map"></div>
+        <div>
+            <a href="myprofile.html" class="flex items-center space-x-2">
+                <img id="navPhoto" src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full border border-gray-300 object-cover">
+                <span id="navName" class="font-semibold text-gray-800 hidden md:inline"></span>
+            </a>
         </div>
-        <div class="mt-6">
-            <h2 class="text-xl font-bold mb-4">Accident Reports</h2>
-            <div class="border rounded-xl overflow-hidden">
-    <div id="realtimeAlerts" class="space-y-4 p-4">
-        <p class="text-center text-gray-500">Waiting for live SOS alerts...</p>
-    </div>
-    <h2 class="px-4 py-2 font-bold text-gray-700">Past Reports (Placeholder)</h2>
-                <button class="accordion-header w-full text-left px-4 py-3 bg-gray-200 hover:bg-gray-300 font-semibold active">
-                    🚑 Patient 1 - Accident at Location X
-                </button>
-                <div class="accordion-content px-4 py-3 bg-gray-50">
-                    <p><strong>Name:</strong> Ram Sharma</p>
-                    <p><strong>Condition:</strong> Serious Injury</p>
-                    <p><strong>Contact:</strong> 9800000001</p>
-                </div>
-                <button class="accordion-header w-full text-left px-4 py-3 bg-gray-200 hover:bg-gray-300 font-semibold">
-                    🚑 Patient 2 - Emergency at Location Y
-                </button>
-                <div class="accordion-content px-4 py-3 bg-gray-50">
-                    <p><strong>Name:</strong> Sita Gurung</p>
-                    <p><strong>Condition:</strong> Minor Injury</p>
-                    <p><strong>Contact:</strong> 9800000002</p>
-                </div>
+    </header>
+
+    <main class="w-full max-w-5xl bg-white rounded-b-2xl shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">👨‍⚕️ Doctor Dashboard</h1>
+
+        <div id="doctorProfile" class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-blue-700 mb-2">My Profile</h2>
+            <p class="text-gray-700"><strong>Name:</strong> <span id="docName">Loading...</span></p>
+            <p class="text-gray-700"><strong>Contact:</strong> <span id="docContact">Loading...</span></p>
+        </div>
+
+        <h2 class="text-2xl font-semibold text-red-600 mb-4 text-center">🚨 Live SOS Alerts</h2>
+        <p class="text-center text-gray-500 mb-4">The map shows real-time SOS alerts from patients.</p>
+
+        <div id="alertsContainer" class="space-y-4 mb-8">
+            <p id="noAlerts" class="text-center text-gray-500">No active SOS alerts.</p>
+        </div>
+
+        <div id="map" class="w-full h-96 rounded-xl shadow-inner"></div>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4 mt-8 text-center">📑 Patient Accident Reports</h2>
+        <div id="reportsContainer" class="space-y-4">
+            <p id="noReports" class="text-center text-gray-500">No reports submitted yet.</p>
+        </div>
+    </main>
+
+    <div id="sosModal" class="modal">
+        <div class="modal-content bg-white shadow-xl relative">
+            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-red-600 mb-4">🚨 SOS Details</h2>
+            <div id="modalContent" class="space-y-4">
+                <p><strong>Patient:</strong> <span id="modalPatientName"></span></p>
+                <p><strong>Contact:</strong> <span id="modalPatientContact"></span></p>
+                <p><strong>Emergency Contact:</strong> <span id="modalEmergencyContact"></span></p>
+                <p><strong>Blood Group:</strong> <span id="modalBloodGroup"></span></p>
+                <a id="modalMapLink" href="#" target="_blank" class="text-blue-500 underline">View on Google Maps</a>
             </div>
         </div>
     </div>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+    
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const userData = JSON.parse(localStorage.getItem("rakshakUser"));
-            const profileDiv = document.getElementById("doctorProfile");
-            const toggleBtn = document.getElementById("toggleStatus");
-            const statusText = document.getElementById("statusText");
-            if (!userData || userData.userType !== "doctor") {
-                profileDiv.innerHTML = "<h2 class='text-center text-red-600 font-semibold'>Access Denied. You are not a doctor or no data found.</h2>";
-                return;
+            const menuBtn = document.getElementById("menuBtn");
+            const menuDropdown = document.getElementById("menuDropdown");
+            const user = JSON.parse(localStorage.getItem("rakshakUser"));
+            const alertsContainer = document.getElementById('alertsContainer');
+            const noAlerts = document.getElementById('noAlerts');
+            const sosModal = document.getElementById('sosModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const reportsContainer = document.getElementById('reportsContainer');
+            let map;
+            let markers = [];
+
+            if (user) {
+                document.getElementById("navName").textContent = user.fullName;
+                if (user.photo && user.photo.startsWith('data:image/')) {
+                    document.getElementById("navPhoto").src = user.photo;
+                } else {
+                    document.getElementById("navPhoto").src = "https://via.placeholder.com/40";
+                }
+                document.getElementById("docName").textContent = user.fullName;
+                document.getElementById("docContact").textContent = user.contact;
             }
-            profileDiv.innerHTML = `
-                <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
-                    <img src="${userData.photo}" alt="Doctor Photo" class="w-32 h-32 rounded-full shadow-md object-cover border-4 border-blue-500">
+
+            menuBtn.addEventListener("click", () => {
+                menuDropdown.classList.toggle("hidden");
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                sosModal.style.display = 'none';
+            });
+
+            window.onclick = (event) => {
+                if (event.target === sosModal) {
+                    sosModal.style.display = 'none';
+                }
+            };
+            
+            window.logout = function() {
+                localStorage.removeItem("rakshakUser");
+                window.location.href = "signin.html";
+            }
+            
+            // Map and WebSocket Logic
+            const serverUrl = "ws://YOUR_LAPTOP_IP:3000"; // Replace with your WebSocket server URL
+
+            function initMap() {
+                const defaultLocation = { lat: 27.7172, lng: 85.3240 };
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: defaultLocation,
+                    zoom: 12,
+                });
+            }
+
+            function addAlertMarker(alert) {
+                const position = { lat: alert.latitude, lng: alert.longitude };
+                const marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: `SOS from ${alert.fullName}`,
+                    icon: {
+                        url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                    }
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `
+                        <div class="p-2">
+                            <h3 class="font-bold text-red-600">🚨 SOS Alert</h3>
+                            <p><strong>Patient:</strong> ${alert.fullName}</p>
+                            <p><strong>Contact:</strong> ${alert.contact}</p>
+                            <p><strong>Blood Group:</strong> ${alert.bloodGroup}</p>
+                            <a href="https://www.google.com/maps/search/?api=1&query=${alert.latitude},${alert.longitude}" target="_blank" class="text-blue-500 underline">View on map</a>
+                        </div>
+                    `
+                });
+
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+                markers.push(marker);
+            }
+
+            function displayAlert(alert) {
+                noAlerts.classList.add('hidden');
+                const alertCard = document.createElement('div');
+                alertCard.className = 'sos-alert-card bg-red-100 rounded-xl shadow-lg p-6 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0';
+                
+                const time = new Date().toLocaleTimeString();
+
+                alertCard.innerHTML = `
                     <div>
-                        <p class="text-lg"><strong>Name:</strong> Dr. ${userData.fullName}</p>
-                        <p class="text-lg"><strong>Age:</strong> ${userData.age}</p>
-                        <p class="text-lg"><strong>Blood Group:</strong> ${userData.bloodGroup}</p>
-                        <p class="text-lg"><strong>Contact:</strong> ${userData.contact}</p>
-                        <p class="text-lg"><strong>Emergency Contact:</strong> ${userData.emergencyContact}</p>
-                        <p class="text-lg"><strong>Insurance Number:</strong> ${userData.insuranceNumber || "N/A"}</p>
+                        <h3 class="text-xl font-bold text-red-700 mb-2">🆘 Emergency!</h3>
+                        <p class="text-gray-700"><strong>Patient Name:</strong> ${alert.fullName}</p>
+                        <p class="text-gray-700"><strong>Blood Group:</strong> ${alert.bloodGroup}</p>
+                        <p class="text-gray-500 text-sm mt-2">Alert received at ${time}</p>
                     </div>
-                </div>
-            `;
-            toggleBtn.addEventListener("click", () => {
-                const isActive = statusText.textContent === "Active";
-                statusText.textContent = isActive ? "Inactive" : "Active";
-                statusText.classList.toggle("text-green-600", !isActive);
-                statusText.classList.toggle("text-red-600", isActive);
-            });
-            const headers = document.querySelectorAll(".accordion-header");
-            headers.forEach(header => {
-                header.addEventListener("click", () => {
-                    header.classList.toggle("active");
-                    const content = header.nextElementSibling;
-                    content.style.display = content.style.display === "block" ? "none" : "block";
+                    <div class="flex items-center space-x-4">
+                        <button class="view-details-btn px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">View Details</button>
+                    </div>
+                `;
+
+                alertCard.querySelector('.view-details-btn').addEventListener('click', () => {
+                    document.getElementById('modalPatientName').textContent = alert.fullName;
+                    document.getElementById('modalPatientContact').textContent = alert.contact;
+                    document.getElementById('modalEmergencyContact').textContent = alert.emergencyContact;
+                    document.getElementById('modalBloodGroup').textContent = alert.bloodGroup;
+                    document.getElementById('modalMapLink').href = `https://www.google.com/maps/search/?api=1&query=${alert.latitude},${alert.longitude}`;
+                    sosModal.style.display = 'block';
                 });
-            });
+
+                alertsContainer.appendChild(alertCard);
+                addAlertMarker(alert);
+            }
+
+            const googleMapsApiKey = "YOUR_API_KEY_HERE"; // Replace with your Google Maps API key
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&callback=initMap`;
+            script.defer = true;
+            document.head.appendChild(script);
+            window.initMap = initMap;
+
+            const ws = new WebSocket(serverUrl);
+            ws.onmessage = (event) => {
+                const alertData = JSON.parse(event.data);
+                displayAlert(alertData);
+            };
+
+            ws.onerror = (error) => {
+                console.error("WebSocket Error:", error);
+            };
+
+            // Accident Reports Logic
+            function renderPatientReports() {
+                const patientReports = JSON.parse(localStorage.getItem("patientReports")) || [];
+                reportsContainer.innerHTML = '';
+                if (patientReports.length === 0) {
+                    document.getElementById('noReports').classList.remove('hidden');
+                } else {
+                    document.getElementById('noReports').classList.add('hidden');
+                    patientReports.forEach(report => {
+                        const reportCard = document.createElement('div');
+                        reportCard.className = 'bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition';
+                        reportCard.innerHTML = `
+                            <h3 class="text-xl font-bold text-gray-700 mb-2">Report for ${report.patientName}</h3>
+                            <p class="text-gray-600 text-sm mb-2">📅 Timestamp: ${new Date(report.timestamp).toLocaleString()}</p>
+                            <p class="text-gray-700"><strong>Accident Details:</strong> ${report.accidentDetails}</p>
+                            <p class="text-gray-700"><strong>Injuries:</strong> ${report.injuryDescription}</p>
+                        `;
+                        reportsContainer.appendChild(reportCard);
+                    });
+                }
+            }
+
+            renderPatientReports();
         });
-
-        function initMap() {
-            const center = { lat: 27.7172, lng: 85.3240 };
-            const map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 13,
-                center: center,
-            });
-
-            const accidents = [
-                { position: { lat: 27.7172, lng: 85.3240 }, name: "Accident at Location X" },
-                { position: { lat: 27.72, lng: 85.33 }, name: "Emergency at Location Y" }
-            ];
-            const ambulances = [
-                { position: { lat: 27.715, lng: 85.32 }, name: "Ambulance 1" },
-                { position: { lat: 27.725, lng: 85.335 }, name: "Ambulance 2" }
-            ];
-            accidents.forEach(accident => {
-                new google.maps.Marker({
-                    position: accident.position,
-                    map,
-                    title: accident.name,
-                    icon: "https://maps.google.com/mapfiles/kml/paddle/red-circle.png" 
-                });
-            });
-            ambulances.forEach(ambulance => {
-                new google.maps.Marker({
-                    position: ambulance.position,
-                    map,
-                    title: ambulance.name,
-                    icon: "https://maps.google.com/mapfiles/kml/paddle/ylw-blank.png" 
-                });
-            });
-        }
-        
-        function logout() {
-            localStorage.removeItem("rakshakUser");
-            window.location.href = "signin.html";
-        }
-const ws = new WebSocket('ws://localhost:3000');
-
-ws.onopen = () => {
-    console.log('Connected to WebSocket server as a doctor.');
-};
-
-ws.onmessage = (event) => {
-    const alertData = JSON.parse(event.data);
-    console.log("🔔 New SOS alert received:", alertData);
-
-    const alertsContainer = document.getElementById('realtimeAlerts');
-
-    const waitingMessage = alertsContainer.querySelector('p');
-    if (waitingMessage && waitingMessage.textContent.includes('Waiting')) {
-        alertsContainer.innerHTML = '';
-    }
-
-    const alertElement = document.createElement('div');
-    alertElement.classList.add('bg-red-100', 'text-red-800', 'p-4', 'rounded-lg', 'shadow-md', 'border', 'border-red-200');
-    
-    alertElement.innerHTML = `
-        <h3 class="font-bold text-xl mb-1">${alertData.fullName} Needs Help!</h3>
-        <p class="text-sm"><strong>Blood Group:</strong> ${alertData.bloodGroup}</p>
-        <p class="text-sm"><strong>Contact:</strong> <a href="tel:${alertData.contact}" class="underline text-red-600">${alertData.contact}</a></p>
-        <p class="text-sm"><strong>Emergency Contact:</strong> <a href="tel:${alertData.emergencyContact}" class="underline text-red-600">${alertData.emergencyContact}</a></p>
-        <p class="text-sm mt-2"><strong>Location:</strong> <a href="https://www.google.com/maps?q=${alertData.latitude},${alertData.longitude}" target="_blank" class="underline text-red-600">View on Map</a></p>
-    `;
-
-    alertsContainer.prepend(alertElement);
-};
-
-ws.onclose = () => {
-    console.log('Disconnected from WebSocket server.');
-};
-
-ws.onerror = (error) => {
-    console.error('WebSocket error:', error);
-};
     </script>
 </body>
 </html>

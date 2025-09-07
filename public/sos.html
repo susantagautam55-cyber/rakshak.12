@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -63,7 +64,13 @@
 
             if (user) {
                 document.getElementById("navName").textContent = user.fullName;
-                document.getElementById("navPhoto").src = user.photo;
+                // Add a check for the photo existence before setting the src
+                if (user.photo && user.photo.startsWith('data:image/')) {
+                    document.getElementById("navPhoto").src = user.photo;
+                } else {
+                    document.getElementById("navPhoto").src = "https://via.placeholder.com/40";
+                }
+                
                 sosContent.classList.remove("hidden");
                 noUserContent.classList.add("hidden");
             } else {
@@ -93,8 +100,10 @@
                                     contact: user.contact,
                                     emergencyContact: user.emergencyContact,
                                     bloodGroup: user.bloodGroup,
-                                    latitude: lat,
-                                    longitude: lng
+                                    location: {
+                                        lat: lat,
+                                        lng: lng
+                                    }
                                 };
 
                                 fetch('/api/sos', {
@@ -105,16 +114,18 @@
                                 .then(response => response.json())
                                 .then(data => {
                                     console.log("Server response:", data);
-                                    setTimeout(() => {
+                                    if (data.received) {
                                         sosContent.innerHTML = `
                                             <h1 class="text-4xl font-extrabold text-green-600 mb-6">✅ Alert Sent!</h1>
                                             <p class="text-gray-700 text-lg mb-8">Help is on the way. Stay calm.</p>
                                         `;
-                                    }, 1500);
+                                    } else {
+                                        sosContent.innerHTML = `<h1 class="text-4xl font-extrabold text-red-600 mb-6">❌ Error</h1><p class="text-gray-700 text-lg mb-8">Could not send alert. Please try again.</p>`;
+                                    }
                                 })
                                 .catch(error => {
                                     console.error("Error sending SOS:", error);
-                                    sosContent.innerHTML = `<h1 class="text-4xl font-extrabold text-red-600 mb-6">❌ Error</h1><p class="text-gray-700 text-lg mb-8">Could not send alert. Please try again.</p>`;
+                                    sosContent.innerHTML = `<h1 class="text-4xl font-extrabold text-red-600 mb-6">❌ Error</h1><p class="text-gray-700 text-lg mb-8">An error occurred. Please try again.</p>`;
                                 });
 
                             },

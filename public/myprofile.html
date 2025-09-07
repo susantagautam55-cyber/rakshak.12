@@ -1,10 +1,10 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .message-box {
@@ -21,38 +21,75 @@
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center py-10 px-4">
-
-    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-2xl rounded-t-3xl shadow-xl z-20">
-        <h1 class="text-xl font-bold">My Profile</h1>
-        <div class="space-x-4">
-            <a href="signin.html" class="hover:underline">Sign Up</a>
-            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
+    <header class="flex justify-between items-center p-4 bg-white shadow-md w-full max-w-5xl rounded-t-2xl">
+        <div class="relative">
+            <button id="menuBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="5" cy="12" r="1.5"/>
+                    <circle cx="12" cy="12" r="1.5"/>
+                    <circle cx="19" cy="12" r="1.5"/>
+                </svg>
+            </button>
+            <div id="menuDropdown" class="hidden absolute mt-2 w-56 bg-white rounded-lg shadow-lg z-50 transition-transform duration-200 ease-out transform origin-top-left">
+                <ul class="py-2 text-gray-700">
+                    <li><a href="myprofile.html" class="block px-4 py-2 hover:bg-gray-100 font-bold">My Profile</a></li>
+                    <li><a href="map.html" class="block px-4 py-2 hover:bg-gray-100">Map</a></li>
+                    <li><a href="connecteddevice.html" class="block px-4 py-2 hover:bg-gray-100">Connected Device</a></li>
+                    <li><a href="associatedhospital.html" class="block px-4 py-2 hover:bg-gray-100">Associated Hospital</a></li>
+                    <li><a href="sos.html" class="block px-4 py-2 hover:bg-gray-100 text-red-600">SOS Page</a></li>
+                </ul>
+            </div>
         </div>
-    </nav>
+        <div>
+            <a href="myprofile.html" class="flex items-center space-x-2">
+                <img id="navPhoto" src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full border border-gray-300 object-cover">
+                <span id="navName" class="font-semibold text-gray-800 hidden md:inline"></span>
+            </a>
+        </div>
+    </header>
 
-    <div id="profileContainer" class="w-full max-w-2xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12 text-gray-800 space-y-4">
-        <div class="text-center">
-            <h2 class="text-3xl font-bold mb-4">Normal User Profile</h2>
-            <img id="userPhoto" alt="Profile Photo" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-500 shadow-lg">
+    <main class="w-full max-w-5xl bg-white rounded-b-2xl shadow-lg p-8">
+        <div id="profileContainer" class="w-full max-w-2xl mx-auto text-gray-800 space-y-4">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold mb-4">User Profile</h2>
+                <img id="userPhoto" alt="Profile Photo" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-500 shadow-lg">
+            </div>
+            
+            <p class="text-lg"><strong>Name:</strong> <span id="pName"></span></p>
+            <p class="text-lg"><strong>Age:</strong> <span id="pAge"></span></p>
+            <p class="text-lg"><strong>Blood Group:</strong> <span id="pBlood"></span></p>
+            <p class="text-lg"><strong>Contact:</strong> <span id="pContact"></span></p>
+            <p class="text-lg"><strong>Emergency Contact:</strong> <span id="pEmergency"></span></p>
+            <p class="text-lg"><strong>Insurance:</strong> <span id="pInsurance"></span></p>
+
+            <div class="text-center mt-8 pt-4 border-t-2 border-dashed border-gray-200">
+                <button id="sosButton" class="w-full py-4 bg-red-600 text-white font-bold rounded-xl text-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-transform duration-300 transform active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856a2 2 0 001.996-2.138L16.48 4.673a2 2 0 00-1.876-1.535H9.395a2 2 0 00-1.876 1.535l-1.954 13.19A2 2 0 007.062 19z" />
+                    </svg>
+                    SOS - I Need Help!
+                </button>
+            </div>
         </div>
         
-        <p class="text-lg"><strong>Name:</strong> <span id="pName"></span></p>
-        <p class="text-lg"><strong>Age:</strong> <span id="pAge"></span></p>
-        <p class="text-lg"><strong>Blood Group:</strong> <span id="pBlood"></span></p>
-        <p class="text-lg"><strong>Contact:</strong> <span id="pContact"></span></p>
-        <p class="text-lg"><strong>Emergency Contact:</strong> <span id="pEmergency"></span></p>
-        <p class="text-lg"><strong>Insurance:</strong> <span id="pInsurance"></span></p>
-
-        <div class="text-center mt-8 pt-4 border-t-2 border-dashed border-gray-200">
-            <button id="sosButton" class="w-full py-4 bg-red-600 text-white font-bold rounded-xl text-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-transform duration-300 transform active:scale-95">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856a2 2 0 001.996-2.138L16.48 4.673a2 2 0 00-1.876-1.535H9.395a2 2 0 00-1.876 1.535l-1.954 13.19A2 2 0 007.062 19z" />
-                </svg>
-                SOS - I Need Help!
-            </button>
+        <div class="mt-12 w-full max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">📝 Accident Report</h2>
+            <form id="accidentReportForm" class="space-y-4">
+                <div>
+                    <label for="accidentDetails" class="block text-sm font-medium text-gray-700 mb-1">Details of the Accident</label>
+                    <textarea id="accidentDetails" name="accidentDetails" rows="4" required class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"></textarea>
+                </div>
+                <div>
+                    <label for="injuryDescription" class="block text-sm font-medium text-gray-700 mb-1">Description of Injuries</label>
+                    <textarea id="injuryDescription" name="injuryDescription" rows="4" required class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"></textarea>
+                </div>
+                <button type="submit" id="reportBtn" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl text-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform duration-300 transform active:scale-95">
+                    Submit Report
+                </button>
+            </form>
         </div>
-    </div>
-    
+    </main>
+
     <div id="messageBox" class="message-box bg-white text-gray-800">
         <p id="messageText" class="text-center font-semibold"></p>
         <button id="closeMessage" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
@@ -66,9 +103,12 @@
         document.addEventListener("DOMContentLoaded", () => {
             const userData = JSON.parse(localStorage.getItem("rakshakUser"));
             const sosButton = document.getElementById('sosButton');
+            const accidentReportForm = document.getElementById('accidentReportForm');
             const messageBox = document.getElementById('messageBox');
             const messageText = document.getElementById('messageText');
             const closeMessageButton = document.getElementById('closeMessage');
+
+            const serverUrl = 'http://localhost:3000/api/sos';
 
             const showMessage = (message, isSuccess = true) => {
                 messageText.textContent = message;
@@ -79,10 +119,30 @@
                 messageBox.style.display = 'block';
             };
 
-            const hideMessage = () => {
-                messageBox.style.display = 'none';
-            };
+            const hideMessage = () => { messageBox.style.display = 'none'; };
             closeMessageButton.addEventListener('click', hideMessage);
+
+            const menuBtn = document.getElementById("menuBtn");
+            const menuDropdown = document.getElementById("menuDropdown");
+            const navName = document.getElementById("navName");
+            const navPhoto = document.getElementById("navPhoto");
+
+            if (userData) {
+                if (navName) { navName.textContent = userData.fullName; }
+                if (navPhoto) {
+                    if (userData.photo && userData.photo.startsWith('data:image/')) {
+                        navPhoto.src = userData.photo;
+                    } else {
+                        navPhoto.src = "https://via.placeholder.com/40";
+                    }
+                }
+            }
+
+            if (menuBtn) {
+                menuBtn.addEventListener("click", () => {
+                    menuDropdown.classList.toggle("hidden");
+                });
+            }
 
             if (!userData) {
                 document.getElementById("profileContainer").innerHTML = "<h2 class='text-center text-red-600 font-semibold'>No user data found. Please sign up.</h2>";
@@ -101,92 +161,85 @@
             document.getElementById("pInsurance").textContent = userData.insuranceNumber || "Not provided";
             document.getElementById("userPhoto").src = userData.photo;
 
-            const ws = new WebSocket('ws://localhost:3000');
-
-            ws.onopen = () => {
-                console.log('Connected to WebSocket server.');
-            };
-
-            ws.onclose = () => {
-                console.log('Disconnected from WebSocket server.');
-                showMessage("Disconnected from server. Please refresh.", false);
-            };
-
             sosButton.addEventListener('click', () => {
                 sosButton.textContent = "Sending...";
                 sosButton.disabled = true;
                 sosButton.classList.add("opacity-50", "cursor-not-allowed");
 
-                if (ws.readyState === WebSocket.OPEN) {
-                    if ("geolocation" in navigator) {
-                        navigator.geolocation.getCurrentPosition(
-                            (position) => {
-                                const lat = position.coords.latitude;
-                                const lng = position.coords.longitude;
-                                
-                                const sosData = {
-                                    fullName: userData.fullName,
-                                    contact: userData.contact,
-                                    emergencyContact: userData.emergencyContact,
-                                    bloodGroup: userData.bloodGroup,
-                                    latitude: lat,
-                                    longitude: lng,
-                                };
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            const sosData = {
+                                fullName: userData.fullName,
+                                contact: userData.contact,
+                                emergencyContact: userData.emergencyContact,
+                                bloodGroup: userData.bloodGroup,
+                                latitude: lat,
+                                longitude: lng,
+                            };
 
-                                fetch('/api/sos', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify(sosData)
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.received) {
-                                        showMessage("SOS alert sent successfully!", true);
-                                    } else {
-                                        showMessage("Failed to send SOS alert.", false);
-                                    }
-                                    sosButton.textContent = "SOS - I Need Help!";
-                                    sosButton.disabled = false;
-                                    sosButton.classList.remove("opacity-50", "cursor-not-allowed");
-                                })
-                                .catch(error => {
-                                    console.error('Error sending SOS:', error);
-                                    showMessage("An error occurred. Could not send SOS.", false);
-                                    sosButton.textContent = "SOS - I Need Help!";
-                                    sosButton.disabled = false;
-                                    sosButton.classList.remove("opacity-50", "cursor-not-allowed");
-                                });
-                            },
-                            (error) => {
-                                console.error("Error getting location:", error);
-                                showMessage("Could not get your location. Please check your browser settings and try again.", false);
+                            fetch(serverUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(sosData)
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                showMessage("SOS alert sent successfully!", true);
                                 sosButton.textContent = "SOS - I Need Help!";
                                 sosButton.disabled = false;
                                 sosButton.classList.remove("opacity-50", "cursor-not-allowed");
-                            }
-                        );
-                    } else {
-                        showMessage("Your browser doesn't support geolocation. Please use a modern browser to send an SOS.", false);
-                        sosButton.textContent = "SOS - I Need Help!";
-                        sosButton.disabled = false;
-                        sosButton.classList.remove("opacity-50", "cursor-not-allowed");
-                    }
+                            })
+                            .catch(error => {
+                                console.error('Error sending SOS:', error);
+                                showMessage("An error occurred. Could not send SOS.", false);
+                                sosButton.textContent = "SOS - I Need Help!";
+                                sosButton.disabled = false;
+                                sosButton.classList.remove("opacity-50", "cursor-not-allowed");
+                            });
+                        },
+                        (error) => {
+                            console.error("Error getting location:", error);
+                            showMessage("Could not get your location. Please check your browser settings and try again.", false);
+                            sosButton.textContent = "SOS - I Need Help!";
+                            sosButton.disabled = false;
+                            sosButton.classList.remove("opacity-50", "cursor-not-allowed");
+                        }
+                    );
                 } else {
-                    showMessage("Connection to server is not open. Please try again.", false);
+                    showMessage("Your browser doesn't support geolocation. Please use a modern browser to send an SOS.", false);
                     sosButton.textContent = "SOS - I Need Help!";
                     sosButton.disabled = false;
                     sosButton.classList.remove("opacity-50", "cursor-not-allowed");
                 }
             });
+
+            accidentReportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const accidentDetails = document.getElementById('accidentDetails').value;
+                const injuryDescription = document.getElementById('injuryDescription').value;
+
+                let patientReports = JSON.parse(localStorage.getItem("patientReports")) || [];
+                const newReport = {
+                    patientName: userData.fullName,
+                    accidentDetails,
+                    injuryDescription,
+                    timestamp: new Date().toISOString()
+                };
+                patientReports.push(newReport);
+                localStorage.setItem("patientReports", JSON.stringify(patientReports));
+                showMessage("Accident report submitted successfully!", true);
+                accidentReportForm.reset();
+            });
         });
 
-        function logout() {
+        window.logout = function() {
             localStorage.removeItem("rakshakUser");
             window.location.href = "signin.html";
         }
     </script>
-
 </body>
 </html>

@@ -4,19 +4,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Associated Hospital - Rakshak</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col justify-center items-center p-6">
-
-    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-5xl rounded-t-2xl shadow-xl z-20">
-        <h1 class="text-xl font-bold">Associated Hospital</h1>
-        <div class="space-x-4">
-            <a href="signin.html" class="hover:underline">Sign Up</a>
-            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
+    <header class="flex justify-between items-center p-4 bg-white shadow-md w-full max-w-5xl rounded-t-2xl">
+        <div class="relative">
+            <button id="menuBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="5" cy="12" r="1.5"/>
+                    <circle cx="12" cy="12" r="1.5"/>
+                    <circle cx="19" cy="12" r="1.5"/>
+                </svg>
+            </button>
+            <div id="menuDropdown" class="hidden absolute mt-2 w-56 bg-white rounded-lg shadow-lg z-50 transition-transform duration-200 ease-out transform origin-top-left">
+                <ul class="py-2 text-gray-700">
+                    <li><a href="myprofile.html" class="block px-4 py-2 hover:bg-gray-100">My Profile</a></li> 
+                    <li><a href="map.html" class="block px-4 py-2 hover:bg-gray-100">Map</a></li>
+                    <li><a href="connecteddevice.html" class="block px-4 py-2 hover:bg-gray-100">Connected Device</a></li>
+                    <li><a href="associatedhospital.html" class="block px-4 py-2 hover:bg-gray-100 font-bold">Associated Hospital</a></li>
+                    <li><a href="sos.html" class="block px-4 py-2 hover:bg-gray-100 text-red-600">SOS Page</a></li>
+                </ul>
+            </div>
         </div>
-    </nav>
+        <div>
+            <a href="myprofile.html" class="flex items-center space-x-2">
+                <img id="navPhoto" src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full border border-gray-300 object-cover">
+                <span id="navName" class="font-semibold text-gray-800 hidden md:inline"></span>
+            </a>
+        </div>
+    </header>
 
-    <div class="w-full max-w-5xl bg-white rounded-b-2xl shadow-lg p-8">
+    <main class="w-full max-w-5xl bg-white rounded-b-2xl shadow-lg p-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">🏥 Associated Hospital</h1>
 
         <div id="hospitalInfo" class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
@@ -57,25 +77,58 @@
                 <p class="text-gray-700">Doctor Notes: <span class="font-semibold">Healthy</span></p>
             </div>
         </div>
-    </div>
+    </main>
     
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            const menuBtn = document.getElementById("menuBtn");
+            const menuDropdown = document.getElementById("menuDropdown");
             const userData = JSON.parse(localStorage.getItem("rakshakUser"));
             const hospitalInfo = document.getElementById("hospitalInfo");
-            
-            if (!userData) {
-                hospitalInfo.innerHTML = "<h2 class='text-center text-red-600 font-semibold'>No user data found. Please sign up.</h2>";
-                return;
-            }
-            document.getElementById("patientName").textContent = userData.fullName;
-            document.getElementById("patientId").textContent = userData.insuranceNumber || "N/A";
-        });
 
-        function logout() {
-            localStorage.removeItem("rakshakUser");
-            window.location.href = "signin.html";
-        }
+            if (userData) {
+                const navName = document.getElementById("navName");
+                const navPhoto = document.getElementById("navPhoto");
+
+                if (navName) {
+                    navName.textContent = userData.fullName;
+                }
+                if (navPhoto) {
+                    if (userData.photo && userData.photo.startsWith('data:image/')) {
+                        navPhoto.src = userData.photo;
+                    } else {
+                        navPhoto.src = "https://via.placeholder.com/40";
+                    }
+                }
+            } else {
+                if (hospitalInfo) {
+                    hospitalInfo.innerHTML = "<h2 class='text-center text-red-600 font-semibold'>No user data found. Please sign up.</h2>";
+                }
+            }
+            
+            if (menuBtn) {
+                menuBtn.addEventListener("click", () => {
+                    menuDropdown.classList.toggle("hidden");
+                });
+            }
+
+            if (userData) {
+                const patientName = document.getElementById("patientName");
+                const patientId = document.getElementById("patientId");
+                
+                if (patientName) {
+                    patientName.textContent = userData.fullName;
+                }
+                if (patientId) {
+                    patientId.textContent = userData.insuranceNumber || "N/A";
+                }
+            }
+
+            window.logout = function() {
+                localStorage.removeItem("rakshakUser");
+                window.location.href = "signin.html";
+            }
+        });
     </script>
 </body>
 </html>

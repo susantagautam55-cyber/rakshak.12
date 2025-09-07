@@ -11,7 +11,7 @@ app.listen(port, () => {
   console.log('----------------------------------------------------------------------');
   console.log('Your files are being served automatically.');
   console.log('You can visit the following pages in your browser:');
-  console.log(`- http://0.0.0.0:${port}/ (for index.html)`);
+  console.log(`- http://localhost:${port}/ (for index.html)`);
   console.log(`- http://localhost:${port}/associatedhospital.html`);
   console.log(`- http://localhost:${port}/connecteddevice.html`);
   console.log(`- http://localhost:${port}/doctormyprofile.html`);

@@ -20,6 +20,130 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-8">
 
+    <script>
+        let crashThreshold = 25;
+        let lastSent = 0;
+        const statusElement = document.getElementById("status");
+        const startButton = document.getElementById("startButton");
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+        const closeMessageButton = document.getElementById('closeMessage');
+        let userProfileData = JSON.parse(localStorage.getItem("rakshakUser"));
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!userProfileData) {
+                statusElement.textContent = "Please sign in to use the sensor.";
+                startButton.disabled = true;
+                return;
+            }
+            if (userProfileData.userType === "doctor") {
+                statusElement.textContent = "This device is for patient use. Please switch accounts.";
+                startButton.disabled = true;
+                return;
+            }
+
+            statusElement.textContent = `Ready to monitor for ${userProfileData.fullName}.`;
+            startButton.disabled = false;
+
+            document.getElementById('closeMessage').addEventListener('click', hideMessage);
+            window.startSensors = startSensors;
+            window.logout = logout;
+        });
+
+        const showMessage = (message, isSuccess = true) => {
+            messageText.textContent = message;
+            messageBox.classList.toggle('bg-green-100', isSuccess);
+            messageBox.classList.toggle('text-green-800', isSuccess);
+            messageBox.classList.toggle('bg-red-100', !isSuccess);
+            messageBox.classList.toggle('text-red-800', !isSuccess);
+            messageBox.style.display = 'block';
+        };
+
+        const hideMessage = () => {
+            messageBox.style.display = 'none';
+        };
+
+        function startSensors() {
+            if (window.DeviceMotionEvent) {
+                window.addEventListener("devicemotion", handleMotion);
+                document.getElementById("status").innerText = "Monitoring started...";
+                showMessage("Monitoring your device for accidents.", true);
+                document.getElementById("startButton").textContent = "Monitoring...";
+                document.getElementById("startButton").disabled = true;
+                document.getElementById("startButton").classList.add("opacity-50", "cursor-not-allowed");
+            } else {
+                showMessage("DeviceMotion is not supported on this device!", false);
+            }
+        }
+
+        function handleMotion(event) {
+            const ax = event.acceleration.x || 0;
+            const ay = event.acceleration.y || 0;
+            const az = event.acceleration.z || 0;
+            const a_res = Math.sqrt(ax*ax + ay*ay + az*az);
+
+            if (a_res > crashThreshold && Date.now() - lastSent > 10000) {
+                lastSent = Date.now();
+                sendSOS(ax, ay, az, a_res);
+            }
+        }
+
+        async function sendSOS(ax, ay, az, a_res) {
+            if (!userProfileData) {
+                showMessage("User profile not loaded. Please sign up or reload.", false);
+                return;
+            }
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(async pos => {
+                    const sosData = {
+                        fullName: userProfileData.fullName,
+                        contact: userProfileData.contact,
+                        emergencyContact: userProfileData.emergencyContact,
+                        bloodGroup: userProfileData.bloodGroup,
+                        location: {
+                            lat: pos.coords.latitude,
+                            lng: pos.coords.longitude
+                        },
+                        reportDetails: `SOS detected! A crash was detected by the device sensors. Acceleration: ${a_res.toFixed(2)} m/s²`,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    try {
+                        const response = await fetch('/api/sos', {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(sosData)
+                        });
+                        const result = await response.json();
+                        
+                        if (result.received) {
+                            document.getElementById("status").innerText = "SOS Sent! A doctor has been notified.";
+                            showMessage("SOS alert sent successfully!", true);
+                        } else {
+                            document.getElementById("status").innerText = "Failed to send SOS!";
+                            showMessage("An error occurred. Could not send SOS.", false);
+                        }
+                    } catch (error) {
+                        console.error("Error sending SOS:", error);
+                        document.getElementById("status").innerText = "Failed to connect to server!";
+                        showMessage("Failed to connect to the server. Please check your network.", false);
+                    }
+                }, error => {
+                    showMessage("Could not get location. Please allow location access.", false);
+                    console.error("Geolocation error:", error);
+                });
+            } else {
+                showMessage("Geolocation is not supported by your browser.", false);
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem("rakshakUser");
+            window.location.href = "signin.html";
+        }
+    </script>
+
     <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-xl rounded-t-3xl shadow-xl z-20">
         <h1 class="text-xl font-bold">Rakshak Sensor</h1>
         <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
@@ -40,107 +164,5 @@
             </svg>
         </button>
     </div>
-    
-    <script>
-         const socket = new WebSocket("ws://YOUR_LAPTOP_IP:192.168.1.6");
-        document.addEventListener("DOMContentLoaded", () => {
-            const serverUrl = "http://localhost:3000/api/sos";
-            let crashThreshold = 25;
-            let lastSent = 0;
-            const statusElement = document.getElementById("status");
-            const startButton = document.getElementById("startButton");
-            const messageBox = document.getElementById('messageBox');
-            const messageText = document.getElementById('messageText');
-            const closeMessageButton = document.getElementById('closeMessage');
-            
-            const user = JSON.parse(localStorage.getItem("rakshakUser"));
-
-            if (!user) {
-                statusElement.textContent = "Please log in to use the sensor.";
-                startButton.disabled = true;
-                return;
-            }
-
-            const showMessage = (message, isSuccess = true) => {
-                messageText.textContent = message;
-                messageBox.classList.toggle('bg-green-100', isSuccess);
-                messageBox.classList.toggle('text-green-800', isSuccess);
-                messageBox.classList.toggle('bg-red-100', !isSuccess);
-                messageBox.classList.toggle('text-red-800', !isSuccess);
-                messageBox.style.display = 'block';
-            };
-
-            const hideMessage = () => {
-                messageBox.style.display = 'none';
-            };
-            closeMessageButton.addEventListener('click', hideMessage);
-
-            function startSensors() {
-                if (window.DeviceMotionEvent) {
-                    window.addEventListener("devicemotion", handleMotion);
-                    statusElement.innerText = "Monitoring started...";
-                    showMessage("Monitoring your device for accidents.", true);
-                    startButton.textContent = "Monitoring...";
-                    startButton.disabled = true;
-                    startButton.classList.add("opacity-50", "cursor-not-allowed");
-                } else {
-                    showMessage("DeviceMotion not supported!", false);
-                }
-            }
-
-            function handleMotion(event) {
-                const ax = event.acceleration.x || 0;
-                const ay = event.acceleration.y || 0;
-                const az = event.acceleration.z || 0;
-                const a_res = Math.sqrt(ax*ax + ay*ay + az*az);
-
-                if (a_res > crashThreshold && Date.now() - lastSent > 10000) {
-                    lastSent = Date.now();
-                    sendSOS(ax, ay, az, a_res);
-                }
-            }
-
-            function sendSOS(ax, ay, az, a_res) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    const data = {
-                        fullName: user.fullName,
-                        contact: user.contact,
-                        emergencyContact: user.emergencyContact,
-                        bloodGroup: user.bloodGroup,
-                        latitude: pos.coords.latitude,
-                        longitude: pos.coords.longitude,
-                        speed: pos.coords.speed,
-                        accel: { ax, ay, az, a_res },
-                        event: "CRASH_DETECTED"
-                    };
-
-                    fetch(serverUrl, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(data)
-                    })
-                    .then(r => r.json())
-                    .then(res => {
-                        statusElement.innerText = "SOS Sent! A doctor has been notified.";
-                        showMessage("SOS alert sent successfully!", true);
-                        console.log(res);
-                    })
-                    .catch(error => {
-                        statusElement.innerText = "Failed to send SOS!";
-                        showMessage("An error occurred. Could not send SOS.", false);
-                        console.error("Error sending SOS:", error);
-                    });
-                }, error => {
-                    showMessage("Could not get location. Please allow location access.", false);
-                    console.error("Geolocation error:", error);
-                });
-            }
-        });
-        
-        function logout() {
-            localStorage.removeItem("rakshakUser");
-            window.location.href = "signin.html";
-        }
-    </script>
 </body>
 </html>

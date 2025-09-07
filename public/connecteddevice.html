@@ -29,14 +29,34 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col items-center p-8">
-    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-3xl rounded-t-3xl shadow-xl z-20">
-        <h1 class="text-xl font-bold">Connected Devices</h1>
-        <div class="space-x-4">
-            <a href="signin.html" class="hover:underline">Sign Up</a>
-            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
+    <header class="flex justify-between items-center p-4 bg-white shadow-md w-full max-w-3xl rounded-t-3xl">
+        <div class="relative">
+            <button id="menuBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="5" cy="12" r="1.5"/>
+                    <circle cx="12" cy="12" r="1.5"/>
+                    <circle cx="19" cy="12" r="1.5"/>
+                </svg>
+            </button>
+            <div id="menuDropdown" class="hidden absolute mt-2 w-56 bg-white rounded-lg shadow-lg z-50 transition-transform duration-200 ease-out transform origin-top-left">
+                <ul class="py-2 text-gray-700">
+                    <li><a href="myprofile.html" class="block px-4 py-2 hover:bg-gray-100">My Profile</a></li> 
+                    <li><a href="map.html" class="block px-4 py-2 hover:bg-gray-100">Map</a></li>
+                    <li><a href="connecteddevice.html" class="block px-4 py-2 hover:bg-gray-100 font-bold">Connected Device</a></li>
+                    <li><a href="associatedhospital.html" class="block px-4 py-2 hover:bg-gray-100">Associated Hospital</a></li>
+                    <li><a href="sos.html" class="block px-4 py-2 hover:bg-gray-100 text-red-600">SOS Page</a></li>
+                </ul>
+            </div>
         </div>
-    </nav>
-    <div class="w-full max-w-3xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12">
+        <div>
+            <a href="myprofile.html" class="flex items-center space-x-2">
+                <img id="navPhoto" src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full border border-gray-300 object-cover">
+                <span id="navName" class="font-semibold text-gray-800 hidden md:inline"></span>
+            </a>
+        </div>
+    </header>
+
+    <main class="w-full max-w-3xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12">
         <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">🔗 Your Connected Devices</h1>
         <div id="devicesContainer" class="space-y-6">
         </div>
@@ -45,7 +65,8 @@
                 ➕ Add a New Device
             </button>
         </div>
-    </div>
+    </main>
+
     <div id="addDeviceModal" class="modal">
         <div class="modal-content bg-white shadow-xl">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Add a New Device</h2>
@@ -70,13 +91,30 @@
             </form>
         </div>
     </div>
+    
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const container = document.getElementById("devicesContainer");
+            const menuBtn = document.getElementById("menuBtn");
+            const menuDropdown = document.getElementById("menuDropdown");
             const addBtn = document.getElementById("addDeviceBtn");
             const modal = document.getElementById("addDeviceModal");
             const form = document.getElementById("addDeviceForm");
             const cancelBtn = document.getElementById("cancelBtn");
+            
+            const user = JSON.parse(localStorage.getItem("rakshakUser"));
+
+            if (user) {
+                document.getElementById("navName").textContent = user.fullName;
+                if (user.photo && user.photo.startsWith('data:image/')) {
+                    document.getElementById("navPhoto").src = user.photo;
+                } else {
+                    document.getElementById("navPhoto").src = "https://via.placeholder.com/40";
+                }
+            }
+
+            menuBtn.addEventListener("click", () => {
+                menuDropdown.classList.toggle("hidden");
+            });
 
             let devices = JSON.parse(localStorage.getItem("connectedDevices")) || [
                 { name: "My Smartwatch", type: "Wearable", status: "Connected" },
@@ -84,6 +122,7 @@
             ];
             
             const renderDevices = () => {
+                const container = document.getElementById("devicesContainer");
                 container.innerHTML = "";
                 if (devices.length === 0) {
                     container.innerHTML = "<p class='text-center text-gray-500 text-lg py-10'>You haven't added any devices yet. Click 'Add a New Device' to get started!</p>";
