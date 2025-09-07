@@ -1,4 +1,3 @@
-<html>
 const express = require('express');
 const bodyParser = require('body-parser');
 const WebSocket = require('ws');
@@ -7,6 +6,7 @@ const path = require('path');
 const app = express();
 
 app.use(bodyParser.json());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const server = app.listen(3000, () => {
@@ -21,7 +21,7 @@ let sockets = [];
 wss.on('connection', ws => {
     sockets.push(ws);
     console.log('A client connected to the WebSocket.');
-    
+
     ws.on('close', () => {
         sockets = sockets.filter(s => s !== ws);
         console.log('A client disconnected from the WebSocket.');
@@ -42,4 +42,3 @@ app.post('/api/signup', (req, res) => {
     console.log("📝 Sign-up data received:", userData);
     res.json({ success: true, message: "User signed up successfully!" });
 });
-</html>
