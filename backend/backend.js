@@ -21,7 +21,7 @@ let sockets = [];
 
 wss.on('connection', ws => {
     sockets.push(ws);
-    console.log('A client connected to the WebSocket.');
+    console.log('A client connected to the WebSocket.'); 
 
     ws.on('close', () => {
         sockets = sockets.filter(s => s !== ws);
