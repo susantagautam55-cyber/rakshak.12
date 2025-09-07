@@ -2,18 +2,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile
-    <link rel="icon" type="image/png" href="https://www.google.com/s2/favicons?domain=https://www.who.int/"></title>
+    <title id="pageTitle">My Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
-    font-family: 'Inter', sans-serif;
-    animation: fadeIn 1s ease-in-out;
-}
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+            font-family: 'Inter', sans-serif;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
         .message-box {
             display: none;
             position: fixed;
@@ -39,7 +38,7 @@
             </button>
             <div id="menuDropdown" class="hidden absolute mt-2 w-56 bg-white rounded-lg shadow-lg z-50 transition-transform duration-200 ease-out transform origin-top-left">
                 <ul class="py-2 text-gray-700">
-                    <li><a href="myprofile.html" class="flex items-center space-x-2 transform transition-all duration-300 hover:scale-105"></li>
+                    <li><a href="myprofile.html" class="flex items-center space-x-2 transform transition-all duration-300 hover:scale-105 font-bold">My Profile</a></li>
                     <li><a href="map.html" class="block px-4 py-2 hover:bg-gray-100">Map</a></li>
                     <li><a href="connecteddevice.html" class="block px-4 py-2 hover:bg-gray-100">Connected Device</a></li>
                     <li><a href="associatedhospital.html" class="block px-4 py-2 hover:bg-gray-100">Associated Hospital</a></li>
@@ -58,7 +57,7 @@
     <main class="w-full max-w-5xl bg-white rounded-b-2xl shadow-lg p-8 transform transition-all duration-300 hover:scale-[1.01] hover:bg-gray-50">
         <div id="profileContainer" class="w-full max-w-2xl mx-auto text-gray-800 space-y-4">
             <div class="text-center">
-                <h2 class="text-3xl font-bold mb-4">User Profile</h2>
+                <h2 id="profileHeader" class="text-3xl font-bold mb-4">User Profile</h2>
                 <img id="userPhoto" alt="Profile Photo" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-500 shadow-lg">
             </div>
             
@@ -70,7 +69,7 @@
             <p class="text-lg"><strong>Insurance:</strong> <span id="pInsurance"></span></p>
 
             <div class="text-center mt-8 pt-4 border-t-2 border-dashed border-gray-200">
-          <button id="sosButton" class="w-full py-4 bg-red-600 text-white font-bold rounded-xl text-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-transform duration-300 transform active:scale-95 hover:scale-[1.02]">
+                <button id="sosButton" class="w-full py-4 bg-red-600 text-white font-bold rounded-xl text-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-transform duration-300 transform active:scale-95 hover:scale-[1.02]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856a2 2 0 001.996-2.138L16.48 4.673a2 2 0 00-1.876-1.535H9.395a2 2 0 00-1.876 1.535l-1.954 13.19A2 2 0 007.062 19z" />
                     </svg>
@@ -84,12 +83,13 @@
             <form id="accidentReportForm" class="space-y-4">
                 <div>
                     <label for="accidentDetails" class="block text-sm font-medium text-gray-700 mb-1">Details of the Accident</label>
-                    <textarea id="accidentDetails" name="accidentDetails" rows="4" required class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors hover:border-gray-400 hover:shadow-sm"></textarea>                </div>
+                    <textarea id="accidentDetails" name="accidentDetails" rows="4" required class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors hover:border-gray-400 hover:shadow-sm"></textarea>
+                </div>
                 <div>
                     <label for="injuryDescription" class="block text-sm font-medium text-gray-700 mb-1">Description of Injuries</label>
                     <textarea id="injuryDescription" name="injuryDescription" rows="4" required class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"></textarea>
                 </div>
-             <button type="submit" id="reportBtn" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl text-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform duration-300 transform active:scale-95 hover:scale-[1.02]">
+                <button type="submit" id="reportBtn" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl text-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform duration-300 transform active:scale-95 hover:scale-[1.02]">
                     Submit Report
                 </button>
             </form>
@@ -135,6 +135,7 @@
             const navPhoto = document.getElementById("navPhoto");
 
             if (userData) {
+                document.getElementById("pageTitle").textContent = `${userData.fullName}'s Profile`;
                 if (navName) { navName.textContent = userData.fullName; }
                 if (navPhoto) {
                     if (userData.photo && userData.photo.startsWith('data:image/')) {
@@ -159,7 +160,8 @@
                 document.getElementById("profileContainer").innerHTML = "<h2 class='text-center text-red-600 font-semibold'>You are a doctor. Please view your profile on the doctor's page.</h2>";
                 return;
             }
-
+            
+            document.getElementById("profileHeader").textContent = `${userData.fullName}'s Profile`;
             document.getElementById("pName").textContent = userData.fullName;
             document.getElementById("pAge").textContent = userData.age;
             document.getElementById("pBlood").textContent = userData.bloodGroup;
