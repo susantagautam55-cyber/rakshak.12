@@ -240,11 +240,12 @@
                     patientName: userData.fullName,
                     accidentDetails,
                     injuryDescription,
-                    policeContact: 100, 
+                    policeContact: 100,
                     timestamp: new Date().toISOString()
                 };
                 patientReports.push(newReport);
                 localStorage.setItem("patientReports", JSON.stringify(patientReports));
+
                 fetch(reportServerUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

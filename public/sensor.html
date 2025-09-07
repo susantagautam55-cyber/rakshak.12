@@ -1,10 +1,18 @@
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Accident Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
         .message-box {
             display: none;
             position: fixed;
@@ -19,18 +27,87 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-8">
+    <header class="flex justify-between items-center p-4 bg-white shadow-md w-full max-w-5xl rounded-t-2xl">
+        <div class="relative">
+            <button id="menuBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transform transition-all duration-300 hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="5" cy="12" r="1.5"/>
+                    <circle cx="12" cy="12" r="1.5"/>
+                    <circle cx="19" cy="12" r="1.5"/>
+                </svg>
+            </button>
+            <div id="menuDropdown" class="hidden absolute mt-2 w-56 bg-white rounded-lg shadow-lg z-50 transition-transform duration-200 ease-out transform origin-top-left">
+                <ul class="py-2 text-gray-700">
+                    <li><a href="myprofile.html" class="block px-4 py-2 hover:bg-gray-100">My Profile</a></li>
+                    <li><a href="map.html" class="block px-4 py-2 hover:bg-gray-100">Map</a></li>
+                    <li><a href="connecteddevice.html" class="block px-4 py-2 hover:bg-gray-100">Connected Device</a></li>
+                    <li><a href="associatedhospital.html" class="block px-4 py-2 hover:bg-gray-100">Associated Hospital</a></li>
+                    <li><a href="sos.html" class="block px-4 py-2 hover:bg-gray-100 text-red-600">SOS Page</a></li>
+                    <li><button onclick="window.logout()" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">Logout</button></li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <a href="myprofile.html" class="flex items-center space-x-2">
+                <img id="navPhoto" src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full border border-gray-300 object-cover">
+                <span id="navName" class="font-semibold text-gray-800 hidden md:inline"></span>
+            </a>
+        </div>
+    </header>
 
+    <main class="w-full max-w-xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12 text-center">
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Patient Device</h2>
+        <p class="text-gray-600 mb-6">Click "Start Monitoring" to simulate a sensor detecting motion or a crash.</p>
+        <button id="startButton" onclick="startSensors()" class="px-6 py-3 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition-transform transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-300">Start Monitoring</button>
+        <p id="status" class="mt-4 text-gray-700 font-semibold">Waiting...</p>
+    </main>
+
+    <div id="messageBox" class="message-box bg-white text-gray-800">
+        <p id="messageText" class="text-center font-semibold"></p>
+        <button id="closeMessage" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    
     <script>
+        const wsServerUrl = "ws://192.168.1.101:3000";
+        const sosServerUrl = "http://192.168.1.101:3000/api/sos";
         let crashThreshold = 25;
         let lastSent = 0;
-        const statusElement = document.getElementById("status");
-        const startButton = document.getElementById("startButton");
-        const messageBox = document.getElementById('messageBox');
-        const messageText = document.getElementById('messageText');
-        const closeMessageButton = document.getElementById('closeMessage');
+
         let userProfileData = JSON.parse(localStorage.getItem("rakshakUser"));
-        
+        const socket = new WebSocket(wsServerUrl);
+
         document.addEventListener("DOMContentLoaded", () => {
+            const statusElement = document.getElementById("status");
+            const startButton = document.getElementById("startButton");
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const closeMessageButton = document.getElementById('closeMessage');
+            const menuBtn = document.getElementById("menuBtn");
+            const menuDropdown = document.getElementById("menuDropdown");
+            const navName = document.getElementById("navName");
+            const navPhoto = document.getElementById("navPhoto");
+
+            if (userProfileData) {
+                if (navName) { navName.textContent = userProfileData.fullName; }
+                if (navPhoto) {
+                    if (userProfileData.photo && userProfileData.photo.startsWith('data:image/')) {
+                        navPhoto.src = userProfileData.photo;
+                    } else {
+                        navPhoto.src = "https://via.placeholder.com/40";
+                    }
+                }
+            }
+
+            if (menuBtn) {
+                menuBtn.addEventListener("click", () => {
+                    menuDropdown.classList.toggle("hidden");
+                });
+            }
+
             if (!userProfileData) {
                 statusElement.textContent = "Please sign in to use the sensor.";
                 startButton.disabled = true;
@@ -51,6 +128,8 @@
         });
 
         const showMessage = (message, isSuccess = true) => {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
             messageText.textContent = message;
             messageBox.classList.toggle('bg-green-100', isSuccess);
             messageBox.classList.toggle('text-green-800', isSuccess);
@@ -60,6 +139,7 @@
         };
 
         const hideMessage = () => {
+            const messageBox = document.getElementById('messageBox');
             messageBox.style.display = 'none';
         };
 
@@ -101,16 +181,15 @@
                         contact: userProfileData.contact,
                         emergencyContact: userProfileData.emergencyContact,
                         bloodGroup: userProfileData.bloodGroup,
-                        location: {
-                            lat: pos.coords.latitude,
-                            lng: pos.coords.longitude
-                        },
-                        reportDetails: `SOS detected! A crash was detected by the device sensors. Acceleration: ${a_res.toFixed(2)} m/s²`,
-                        timestamp: new Date().toISOString()
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude,
+                        speed: pos.coords.speed,
+                        accel: { ax, ay, az, a_res },
+                        event: "CRASH_DETECTED"
                     };
 
                     try {
-                        const response = await fetch('/api/sos', {
+                        const response = await fetch(sosServerUrl, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(sosData)
@@ -143,26 +222,5 @@
             window.location.href = "signin.html";
         }
     </script>
-
-    <nav class="flex justify-between items-center p-4 bg-blue-600 text-white w-full max-w-xl rounded-t-3xl shadow-xl z-20">
-        <h1 class="text-xl font-bold">Rakshak Sensor</h1>
-        <button onclick="logout()" class="px-3 py-1 bg-white text-blue-600 rounded-full hover:bg-gray-200">Logout</button>
-    </nav>
-    
-    <div class="w-full max-w-xl bg-white rounded-b-3xl shadow-2xl p-8 md:p-12 text-center">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">Patient Device</h2>
-        <p class="text-gray-600 mb-6">Click "Start Monitoring" to simulate a sensor detecting motion or a crash.</p>
-        <button id="startButton" onclick="startSensors()" class="px-6 py-3 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition-transform transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-300">Start Monitoring</button>
-        <p id="status" class="mt-4 text-gray-700 font-semibold">Waiting...</p>
-    </div>
-
-    <div id="messageBox" class="message-box bg-white text-gray-800">
-        <p id="messageText" class="text-center font-semibold"></p>
-        <button id="closeMessage" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-    </div>
 </body>
 </html>

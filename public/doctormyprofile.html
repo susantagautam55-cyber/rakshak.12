@@ -235,7 +235,7 @@
                 addAlertMarker(alert);
             }
 
-            const googleMapsApiKey = "YOUR_API_KEY_HERE"; // Replace with your Google Maps API key
+            const googleMapsApiKey = "YOUR_API_KEY_HERE"; 
             const script = document.createElement('script');
             script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&callback=initMap`;
             script.defer = true;
@@ -252,7 +252,6 @@
                 console.error("WebSocket Error:", error);
             };
 
-            // Accident Reports Logic
             function renderPatientReports() {
                 const patientReports = JSON.parse(localStorage.getItem("patientReports")) || [];
                 reportsContainer.innerHTML = '';
