@@ -1,15 +1,12 @@
 const express = require('express');
 const path = require('path');
 
-// Initialize the Express application
 const app = express();
 const port = 3000;
 
-// Use a single line to serve all your HTML, CSS, and JS files.
-// This tells Express to look for files in the same directory as this server script.
 app.use(express.static(__dirname));
 
-// Start the server and listen for incoming requests on the specified port.
+
 app.listen(port, () => {
   console.log(`Server is running! You can view your website at http://localhost:${port}`);
   console.log('----------------------------------------------------------------------');
