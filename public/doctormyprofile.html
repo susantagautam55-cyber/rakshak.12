@@ -66,24 +66,31 @@
     <main class="w-full max-w-5xl bg-white rounded-b-2xl shadow-lg p-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">👨‍⚕️ Doctor Dashboard</h1>
 
-        <div id="doctorProfile" class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-            <h2 class="text-2xl font-semibold text-blue-700 mb-2">My Profile</h2>
-            <p class="text-gray-700"><strong>Name:</strong> <span id="docName">Loading...</span></p>
-            <p class="text-gray-700"><strong>Contact:</strong> <span id="docContact">Loading...</span></p>
+        <div id="mainContent">
+            <div id="doctorProfile" class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-blue-700 mb-2">My Profile</h2>
+                <p class="text-gray-700"><strong>Name:</strong> <span id="docName">Loading...</span></p>
+                <p class="text-gray-700"><strong>Contact:</strong> <span id="docContact">Loading...</span></p>
+            </div>
+
+            <h2 class="text-2xl font-semibold text-red-600 mb-4 text-center">🚨 Live SOS Alerts</h2>
+            <p class="text-center text-gray-500 mb-4">The map shows real-time SOS alerts from patients.</p>
+
+            <div id="alertsContainer" class="space-y-4 mb-8">
+                <p id="noAlerts" class="text-center text-gray-500">No active SOS alerts.</p>
+            </div>
+
+            <div id="map" class="w-full h-96 rounded-xl shadow-inner"></div>
+
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 mt-8 text-center">📑 Patient Accident Reports</h2>
+            <div id="reportsContainer" class="space-y-4">
+                <p id="noReports" class="text-center text-gray-500">No reports submitted yet.</p>
+            </div>
         </div>
 
-        <h2 class="text-2xl font-semibold text-red-600 mb-4 text-center">🚨 Live SOS Alerts</h2>
-        <p class="text-center text-gray-500 mb-4">The map shows real-time SOS alerts from patients.</p>
-
-        <div id="alertsContainer" class="space-y-4 mb-8">
-            <p id="noAlerts" class="text-center text-gray-500">No active SOS alerts.</p>
-        </div>
-
-        <div id="map" class="w-full h-96 rounded-xl shadow-inner"></div>
-
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4 mt-8 text-center">📑 Patient Accident Reports</h2>
-        <div id="reportsContainer" class="space-y-4">
-            <p id="noReports" class="text-center text-gray-500">No reports submitted yet.</p>
+        <div id="unauthorizedContent" class="hidden text-center text-red-600 mt-20">
+            <h1 class="text-3xl font-bold mb-4">Access Denied</h1>
+            <p class="text-lg">You must be a doctor to view this page. Please <a href="myprofile.html" class="underline font-semibold">go to your profile</a>.</p>
         </div>
     </main>
 
@@ -110,6 +117,8 @@
             const menuBtn = document.getElementById("menuBtn");
             const menuDropdown = document.getElementById("menuDropdown");
             const user = JSON.parse(localStorage.getItem("rakshakUser"));
+            const mainContent = document.getElementById('mainContent');
+            const unauthorizedContent = document.getElementById('unauthorizedContent');
             const alertsContainer = document.getElementById('alertsContainer');
             const noAlerts = document.getElementById('noAlerts');
             const sosModal = document.getElementById('sosModal');
@@ -118,15 +127,22 @@
             let map;
             let markers = [];
 
-            if (user) {
-                document.getElementById("navName").textContent = user.fullName;
-                if (user.photo && user.photo.startsWith('data:image/')) {
-                    document.getElementById("navPhoto").src = user.photo;
-                } else {
-                    document.getElementById("navPhoto").src = "https://via.placeholder.com/40";
+            if (user && user.userType === 'doctor') {
+                mainContent.classList.remove('hidden');
+                unauthorizedContent.classList.add('hidden');
+                if (user) {
+                    document.getElementById("navName").textContent = user.fullName;
+                    if (user.photo && user.photo.startsWith('data:image/')) {
+                        document.getElementById("navPhoto").src = user.photo;
+                    } else {
+                        document.getElementById("navPhoto").src = "https://via.placeholder.com/40";
+                    }
+                    document.getElementById("docName").textContent = user.fullName;
+                    document.getElementById("docContact").textContent = user.contact;
                 }
-                document.getElementById("docName").textContent = user.fullName;
-                document.getElementById("docContact").textContent = user.contact;
+            } else {
+                mainContent.classList.add('hidden');
+                unauthorizedContent.classList.remove('hidden');
             }
 
             menuBtn.addEventListener("click", () => {
@@ -148,8 +164,7 @@
                 window.location.href = "signin.html";
             }
             
-            // Map and WebSocket Logic
-            const serverUrl = "ws://YOUR_LAPTOP_IP:3000"; // Replace with your WebSocket server URL
+            const serverUrl = "ws://YOUR_LAPTOP_IP:3000";
 
             function initMap() {
                 const defaultLocation = { lat: 27.7172, lng: 85.3240 };
@@ -242,9 +257,12 @@
                 const patientReports = JSON.parse(localStorage.getItem("patientReports")) || [];
                 reportsContainer.innerHTML = '';
                 if (patientReports.length === 0) {
-                    document.getElementById('noReports').classList.remove('hidden');
+                    const noReports = document.createElement('p');
+                    noReports.id = 'noReports';
+                    noReports.className = 'text-center text-gray-500';
+                    noReports.textContent = 'No reports submitted yet.';
+                    reportsContainer.appendChild(noReports);
                 } else {
-                    document.getElementById('noReports').classList.add('hidden');
                     patientReports.forEach(report => {
                         const reportCard = document.createElement('div');
                         reportCard.className = 'bg-gray-50 border rounded-xl shadow p-6 hover:shadow-md transition';
@@ -258,8 +276,9 @@
                     });
                 }
             }
-
-            renderPatientReports();
+            if (user && user.userType === 'doctor') {
+                renderPatientReports();
+            }
         });
     </script>
 </body>

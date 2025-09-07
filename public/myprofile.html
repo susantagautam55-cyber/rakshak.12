@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -108,7 +107,8 @@
             const messageText = document.getElementById('messageText');
             const closeMessageButton = document.getElementById('closeMessage');
 
-            const serverUrl = 'http://localhost:3000/api/sos';
+            const sosServerUrl = 'http://localhost:3000/api/sos';
+            const reportServerUrl = 'http://localhost:3000/api/report';
 
             const showMessage = (message, isSuccess = true) => {
                 messageText.textContent = message;
@@ -181,7 +181,7 @@
                                 longitude: lng,
                             };
 
-                            fetch(serverUrl, {
+                            fetch(sosServerUrl, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(sosData)
@@ -231,8 +231,22 @@
                 };
                 patientReports.push(newReport);
                 localStorage.setItem("patientReports", JSON.stringify(patientReports));
-                showMessage("Accident report submitted successfully!", true);
-                accidentReportForm.reset();
+
+                // Send report to the server
+                fetch(reportServerUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...newReport, emergencyContact: userData.emergencyContact })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showMessage("Accident report submitted successfully!", true);
+                    accidentReportForm.reset();
+                })
+                .catch(error => {
+                    console.error('Error sending report to server:', error);
+                    showMessage("Report saved locally, but failed to send to server.", false);
+                });
             });
         });
 
