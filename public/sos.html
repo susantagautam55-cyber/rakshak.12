@@ -70,7 +70,6 @@
 
             if (user) {
                 document.getElementById("navName").textContent = user.fullName;
-                // Add a check for the photo existence before setting the src
                 if (user.photo && user.photo.startsWith('data:image/')) {
                     document.getElementById("navPhoto").src = user.photo;
                 } else {

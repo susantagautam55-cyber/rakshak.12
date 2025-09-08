@@ -2,18 +2,22 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const WebSocket = require('ws');
 const path = require('path');
-const { connect } = require('http2');
 
 const app = express();
+const port = 3000;
 
 app.use(bodyParser.json());
 
-app.use(express.static(path.join(__dirname, 'public')));
 
-const server = app.listen(3000, '0.0.0.0', () => {
-    console.log("Server running on port 3000!");
-    console.log("Your website is live");
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+
+const server = app.listen(port, () => {
+    console.log(`✅ Server is running! View your website at http://localhost:${port}`);
+    console.log('----------------------------------------------------------------------');
 });
+
+
 
 const wss = new WebSocket.Server({ server });
 
@@ -21,21 +25,29 @@ let sockets = [];
 
 wss.on('connection', ws => {
     sockets.push(ws);
-    console.log('A client connected to the WebSocket.'); 
+    console.log('🔌 A client connected to the WebSocket.');
 
     ws.on('close', () => {
         sockets = sockets.filter(s => s !== ws);
-        console.log('A client disconnected from the WebSocket.');
+        console.log('👋 A client disconnected from the WebSocket.');
     });
 });
+
+
 
 app.post('/api/sos', (req, res) => {
     const data = req.body;
     console.log("🚨 SOS received:", data);
 
-    sockets.forEach(ws => ws.send(JSON.stringify(data)));
+    const message = JSON.stringify(data);
 
-    res.json({ status: "ok", received: true });
+    sockets.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(message);
+        }
+    });
+
+    res.json({ status: "ok", message: "SOS broadcasted to all clients." });
 });
 
 app.post('/api/signup', (req, res) => {

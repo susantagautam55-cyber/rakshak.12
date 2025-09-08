@@ -70,157 +70,163 @@
             </svg>
         </button>
     </div>
+   <script>
+    const wsServerUrl = "ws://192.168.1.101:3000";
+    const sosServerUrl = "http://192.168.1.101:3000/api/sos";
+    let crashThreshold = 25;
+    let lastSent = 0;
+
+    let userProfileData = {
+        fullName: "Test Patient",
+        contact: "9876543210",
+        emergencyContact: "0123456789",
+        bloodGroup: "O+",
+        userType: "patient"
+    };
     
-    <script>
-        const wsServerUrl = "ws://192.168.1.101:3000";
-        const sosServerUrl = "http://192.168.1.101:3000/api/sos";
-        let crashThreshold = 25;
-        let lastSent = 0;
+    const socket = new WebSocket(wsServerUrl);
 
-        let userProfileData = JSON.parse(localStorage.getItem("rakshakUser"));
-        const socket = new WebSocket(wsServerUrl);
+    document.addEventListener("DOMContentLoaded", () => {
+        const statusElement = document.getElementById("status");
+        const startButton = document.getElementById("startButton");
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+        const closeMessageButton = document.getElementById('closeMessage');
+        const menuBtn = document.getElementById("menuBtn");
+        const menuDropdown = document.getElementById("menuDropdown");
+        const navName = document.getElementById("navName");
+        const navPhoto = document.getElementById("navPhoto");
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const statusElement = document.getElementById("status");
-            const startButton = document.getElementById("startButton");
-            const messageBox = document.getElementById('messageBox');
-            const messageText = document.getElementById('messageText');
-            const closeMessageButton = document.getElementById('closeMessage');
-            const menuBtn = document.getElementById("menuBtn");
-            const menuDropdown = document.getElementById("menuDropdown");
-            const navName = document.getElementById("navName");
-            const navPhoto = document.getElementById("navPhoto");
-
-            if (userProfileData) {
-                if (navName) { navName.textContent = userProfileData.fullName; }
-                if (navPhoto) {
-                    if (userProfileData.photo && userProfileData.photo.startsWith('data:image/')) {
-                        navPhoto.src = userProfileData.photo;
-                    } else {
-                        navPhoto.src = "https://via.placeholder.com/40";
-                    }
+        if (userProfileData) {
+            if (navName) { navName.textContent = userProfileData.fullName; }
+            if (navPhoto) {
+                if (userProfileData.photo && userProfileData.photo.startsWith('data:image/')) {
+                    navPhoto.src = userProfileData.photo;
+                } else {
+                    navPhoto.src = "https://via.placeholder.com/40";
                 }
             }
-
-            if (menuBtn) {
-                menuBtn.addEventListener("click", () => {
-                    menuDropdown.classList.toggle("hidden");
-                });
-            }
-
-            if (!userProfileData) {
-                statusElement.textContent = "Please sign in to use the sensor.";
-                startButton.disabled = true;
-                return;
-            }
-            if (userProfileData.userType === "doctor") {
-                statusElement.textContent = "This device is for patient use. Please switch accounts.";
-                startButton.disabled = true;
-                return;
-            }
-
-            statusElement.textContent = `Ready to monitor for ${userProfileData.fullName}.`;
-            startButton.disabled = false;
-
-            document.getElementById('closeMessage').addEventListener('click', hideMessage);
-            window.startSensors = startSensors;
-            window.logout = logout;
-        });
-
-        const showMessage = (message, isSuccess = true) => {
-            const messageBox = document.getElementById('messageBox');
-            const messageText = document.getElementById('messageText');
-            messageText.textContent = message;
-            messageBox.classList.toggle('bg-green-100', isSuccess);
-            messageBox.classList.toggle('text-green-800', isSuccess);
-            messageBox.classList.toggle('bg-red-100', !isSuccess);
-            messageBox.classList.toggle('text-red-800', !isSuccess);
-            messageBox.style.display = 'block';
-        };
-
-        const hideMessage = () => {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.style.display = 'none';
-        };
-
-        function startSensors() {
-            if (window.DeviceMotionEvent) {
-                window.addEventListener("devicemotion", handleMotion);
-                document.getElementById("status").innerText = "Monitoring started...";
-                showMessage("Monitoring your device for accidents.", true);
-                document.getElementById("startButton").textContent = "Monitoring...";
-                document.getElementById("startButton").disabled = true;
-                document.getElementById("startButton").classList.add("opacity-50", "cursor-not-allowed");
-            } else {
-                showMessage("DeviceMotion is not supported on this device!", false);
-            }
         }
 
-        function handleMotion(event) {
-            const ax = event.acceleration.x || 0;
-            const ay = event.acceleration.y || 0;
-            const az = event.acceleration.z || 0;
-            const a_res = Math.sqrt(ax*ax + ay*ay + az*az);
-
-            if (a_res > crashThreshold && Date.now() - lastSent > 10000) {
-                lastSent = Date.now();
-                sendSOS(ax, ay, az, a_res);
-            }
+        if (menuBtn) {
+            menuBtn.addEventListener("click", () => {
+                menuDropdown.classList.toggle("hidden");
+            });
         }
 
-        async function sendSOS(ax, ay, az, a_res) {
-            if (!userProfileData) {
-                showMessage("User profile not loaded. Please sign up or reload.", false);
-                return;
-            }
+        if (!userProfileData) {
+            statusElement.textContent = "Please sign in to use the sensor.";
+            startButton.disabled = true;
+            return;
+        }
+        if (userProfileData.userType === "doctor") {
+            statusElement.textContent = "This device is for patient use. Please switch accounts.";
+            startButton.disabled = true;
+            return;
+        }
 
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(async pos => {
-                    const sosData = {
-                        fullName: userProfileData.fullName,
-                        contact: userProfileData.contact,
-                        emergencyContact: userProfileData.emergencyContact,
-                        bloodGroup: userProfileData.bloodGroup,
-                        latitude: pos.coords.latitude,
-                        longitude: pos.coords.longitude,
-                        speed: pos.coords.speed,
-                        accel: { ax, ay, az, a_res },
-                        event: "CRASH_DETECTED"
-                    };
+        statusElement.textContent = `Ready to monitor for ${userProfileData.fullName}.`;
+        startButton.disabled = false;
+        document.getElementById('closeMessage').addEventListener('click', hideMessage);
+        window.startSensors = startSensors;
+        window.logout = logout;
+    });
 
-                    try {
-                        const response = await fetch(sosServerUrl, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(sosData)
-                        });
-                        const result = await response.json();
-                        
-                        if (result.received) {
-                            document.getElementById("status").innerText = "SOS Sent! A doctor has been notified.";
-                            showMessage("SOS alert sent successfully!", true);
-                        } else {
-                            document.getElementById("status").innerText = "Failed to send SOS!";
-                            showMessage("An error occurred. Could not send SOS.", false);
-                        }
-                    } catch (error) {
-                        console.error("Error sending SOS:", error);
-                        document.getElementById("status").innerText = "Failed to connect to server!";
-                        showMessage("Failed to connect to the server. Please check your network.", false);
+    const showMessage = (message, isSuccess = true) => {
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+        messageText.textContent = message;
+        messageBox.classList.toggle('bg-green-100', isSuccess);
+        messageBox.classList.toggle('text-green-800', isSuccess);
+        messageBox.classList.toggle('bg-red-100', !isSuccess);
+        messageBox.classList.toggle('text-red-800', !isSuccess);
+        messageBox.style.display = 'block';
+    };
+
+    const hideMessage = () => {
+        const messageBox = document.getElementById('messageBox');
+        messageBox.style.display = 'none';
+    };
+
+    function startSensors() {
+        if (window.DeviceMotionEvent) {
+            window.addEventListener("devicemotion", handleMotion);
+            document.getElementById("status").innerText = "Monitoring started...";
+            showMessage("Monitoring your device for accidents.", true);
+            document.getElementById("startButton").textContent = "Monitoring...";
+            document.getElementById("startButton").disabled = true;
+            document.getElementById("startButton").classList.add("opacity-50", "cursor-not-allowed");
+        } else {
+            showMessage("DeviceMotion not supported!", false);
+        }
+    }
+
+    function handleMotion(event) {
+        const ax = event.acceleration.x || 0;
+        const ay = event.acceleration.y || 0;
+        const az = event.acceleration.z || 0;
+        const a_res = Math.sqrt(ax*ax + ay*ay + az*az);
+
+        if (a_res > crashThreshold && Date.now() - lastSent > 10000) {
+            lastSent = Date.now();
+            sendSOS(ax, ay, az, a_res);
+        }
+    }
+
+    async function sendSOS(ax, ay, az, a_res) {
+        if (!userProfileData) {
+            showMessage("User profile not loaded. Cannot send SOS.", false);
+            return;
+        }
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(async pos => {
+                const sosData = {
+                    fullName: userProfileData.fullName,
+                    contact: userProfileData.contact,
+                    emergencyContact: userProfileData.emergencyContact,
+                    bloodGroup: userProfileData.bloodGroup,
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                    speed: pos.coords.speed,
+                    accel: { ax, ay, az, a_res },
+                    event: "CRASH_DETECTED"
+                };
+
+                try {
+                    const response = await fetch(sosServerUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(sosData)
+                    });
+                    const result = await response.json();
+                    
+                    if (result.received) {
+                        document.getElementById("status").innerText = "SOS Sent! Doctor Notified.";
+                        showMessage("SOS alert sent successfully!", true);
+                    } else {
+                        document.getElementById("status").innerText = "Failed to send SOS!";
+                        showMessage("Error: Could not send SOS.", false);
                     }
-                }, error => {
-                    showMessage("Could not get location. Please allow location access.", false);
-                    console.error("Geolocation error:", error);
-                });
-            } else {
-                showMessage("Geolocation is not supported by your browser.", false);
-            }
+                } catch (error) {
+                    console.error("SOS Error:", error);
+                    document.getElementById("status").innerText = "Server connection failed!";
+                    showMessage("Failed to connect to the server.", false);
+                }
+            }, error => {
+                showMessage("Location access denied. Please enable it.", false);
+                console.error("Geolocation error:", error);
+            });
+        } else {
+            showMessage("Geolocation not supported by this browser.", false);
         }
-        
-        function logout() {
-            localStorage.removeItem("rakshakUser");
-            window.location.href = "signin.html";
-        }
-    </script>
+    }
+    
+    function logout() {
+        alert("This is a demo page. Logout is disabled.");
+    }
+</script> 
+    
+   
 </body>
 </html>
