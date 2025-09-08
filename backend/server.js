@@ -20,4 +20,5 @@ app.listen(port, () => {
   console.log(`- http://localhost:${port}/sensor.html`);
   console.log(`- http://localhost:${port}/signin.html`);
   console.log(`- http://localhost:${port}/sos.html`);
+  console.log(`- http://localhost:${port}/index.html`);
 });
